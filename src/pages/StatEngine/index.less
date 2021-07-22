@@ -12,6 +12,11 @@
     margin-right: 6px;
   }
 
+  .ant-btn > .anticon + span,
+  .ant-btn > span + .anticon {
+    margin-left: 0;
+  }
+
   .left .left__content,
   .right .right__content {
     display: flex;
@@ -39,6 +44,7 @@
 
           .markdown-viewer {
             max-height: 250px;
+            padding: 0 10px;
             overflow: scroll;
           }
         }
@@ -90,17 +96,7 @@
         padding: 0 4px;
 
         .right__tabs-result {
-          height: calc(100% - 180px);
-        }
-
-        .right__tabs-log {
-          height: 180px;
-
-          .log-viewer {
-            max-height: 115px;
-            padding: 0 0 5px;
-            overflow: scroll;
-          }
+          height: 100%;
         }
       }
     }

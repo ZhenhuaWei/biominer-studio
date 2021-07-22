@@ -11,7 +11,6 @@ import {
   ContainerOutlined,
   SnippetsOutlined,
   HistoryOutlined,
-  ReloadOutlined,
   IssuesCloseOutlined,
 } from '@ant-design/icons';
 import React, { useState } from 'react';
@@ -26,15 +25,14 @@ const { TabPane } = Tabs;
 const StatEngine: React.FC = () => {
   const [leftSpan, setLeftSpan] = useState<number>(12);
   const [dataKeys] = useState<DataKey[]>([
-    { title: 'Data', data: [] },
-    { title: 'Sample Data', data: [] },
+    { title: 'Data', data: [], key: 'data' },
+    { title: 'Sample Data', data: [], key: 'sample-data' },
   ]);
   const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
-  const [logLink, setLogLink] = useState<string>('');
 
   const getLogLink = function (url: string) {
     console.log('Log Link: ', url);
-    return `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md?random_str=${Math.random()
+    return `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log?random_str=${Math.random()
       .toString(36)
       .slice(-8)}`;
   };
@@ -71,17 +69,6 @@ const StatEngine: React.FC = () => {
         <Button icon={<HistoryOutlined />}>History</Button>
       </Tooltip>
     </Space>
-  );
-
-  const logOperations = (
-    <Button
-      onClick={() => {
-        setLogLink(getLogLink(''));
-      }}
-      icon={<ReloadOutlined />}
-    >
-      Refresh
-    </Button>
   );
 
   const getRightSpan = function (customLeftSpan: number): number {
@@ -225,12 +212,6 @@ const StatEngine: React.FC = () => {
                     Comming Soon...
                   </Col>
                 </TabPane>
-              </Tabs>
-              <Tabs
-                defaultActiveKey="1"
-                className="right__tabs-log"
-                tabBarExtraContent={logOperations}
-              >
                 <TabPane
                   tab={
                     <span>
@@ -238,9 +219,9 @@ const StatEngine: React.FC = () => {
                       Log
                     </span>
                   }
-                  key="1"
+                  key="3"
                 >
-                  <LogViewer url={logLink} />
+                  <LogViewer height="570" url={getLogLink('')} />
                 </TabPane>
               </Tabs>
             </Col>

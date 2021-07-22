@@ -1,30 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { fetchLog } from './service';
-import './index.less';
+import { LazyLog } from 'react-lazylog';
 
 export type LogProps = {
   url: string;
+  height: string;
 };
 
 const LogViewer: React.FC<LogProps> = (props) => {
-  const { url } = props;
+  const { url, height } = props;
 
-  const [log, setLog] = useState<string>('No Content.');
-
-  useEffect(() => {
-    if (url.length > 0) {
-      fetchLog(url).then((response) => setLog(response || 'No content.'));
-    }
-  }, [url]);
-
-  return (
-    <div
-      className="log-viewer"
-      dangerouslySetInnerHTML={{
-        __html: log,
-      }}
-    ></div>
-  );
+  return <LazyLog height={height} url={url} enableSearch extraLines={1} follow />;
 };
 
 export default LogViewer;
