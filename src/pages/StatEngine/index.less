@@ -1,0 +1,102 @@
+// Header Height + Top Padding
+@header-height-offset: 48px + 10px;
+@left-panel-height-offset: @header-height-offset + 10px;
+@right-tabs-height-offset: @header-height-offset + 10px;
+
+.stat-engine {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: calc(100vh - @header-height-offset);
+
+  .ant-tabs-tab .anticon {
+    margin-right: 6px;
+  }
+
+  .left .left__content,
+  .right .right__content {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    padding: 0 10px;
+    background-color: #fff;
+    border: 1px solid #d6d6d6;
+    border-radius: 5px;
+  }
+
+  .left {
+    .left__content {
+      .left__tabs {
+        width: calc(100% - 2px);
+        height: calc(100vh - @left-panel-height-offset);
+
+        .left__tabs__summary,
+        .left__tabs__arguments {
+          width: 100%;
+        }
+
+        .left__tabs__summary {
+          height: 50%;
+        }
+
+        .left__tabs__arguments {
+          height: 50%;
+        }
+      }
+
+      .left__divider {
+        position: absolute;
+        top: 0;
+        right: -4px;
+        width: 8px;
+        height: 100%;
+        padding: 0 !important;
+        cursor: col-resize;
+
+        .resize-btn {
+          position: absolute;
+          left: -12px;
+          z-index: 1;
+        }
+
+        .btn-1 {
+          top: 40%;
+        }
+
+        .btn-2 {
+          top: calc(40% + 40px);
+        }
+
+        .btn-3 {
+          top: calc(40% + 80px);
+        }
+
+        .btn-4 {
+          top: calc(40% + 120px);
+        }
+      }
+    }
+  }
+
+  .right {
+    .right__content {
+      .right__tabs {
+        height: calc(100vh - @right-tabs-height-offset);
+        padding: 0 4px;
+
+        .right__tabs-result {
+          height: calc(100% - 180px);
+        }
+
+        .right__tabs-log {
+          height: 180px;
+
+          p {
+            height: 100px;
+            padding: 0 10px;
+            overflow: scroll;
+          }
+        }
+      }
+    }
+  }
+}
