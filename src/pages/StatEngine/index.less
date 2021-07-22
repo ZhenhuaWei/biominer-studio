@@ -36,6 +36,11 @@
 
         .left__tabs__summary {
           height: 50%;
+
+          .markdown-viewer {
+            max-height: 250px;
+            overflow: scroll;
+          }
         }
 
         .left__tabs__arguments {
@@ -80,6 +85,7 @@
   .right {
     .right__content {
       .right__tabs {
+        width: 100%;
         height: calc(100vh - @right-tabs-height-offset);
         padding: 0 4px;
 
@@ -90,9 +96,9 @@
         .right__tabs-log {
           height: 180px;
 
-          p {
-            height: 100px;
-            padding: 0 10px;
+          .log-viewer {
+            max-height: 115px;
+            padding: 0 0 5px;
             overflow: scroll;
           }
         }

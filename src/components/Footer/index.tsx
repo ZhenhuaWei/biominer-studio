@@ -14,8 +14,8 @@ export default () => {
       copyright={`2020 ${defaultMessage}`}
       links={[
         {
-          key: 'Ant Design Pro',
-          title: 'Ant Design Pro',
+          key: 'BioMiner',
+          title: 'BioMiner',
           href: 'https://pro.ant.design',
           blankTarget: true,
         },
@@ -26,8 +26,8 @@ export default () => {
           blankTarget: true,
         },
         {
-          key: 'Ant Design',
-          title: 'Ant Design',
+          key: 'ClinicoOmics',
+          title: 'ClinicoOmics',
           href: 'https://ant.design',
           blankTarget: true,
         },

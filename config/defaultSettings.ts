@@ -13,9 +13,9 @@ const Settings: LayoutSettings & {
   fixSiderbar: true,
   colorWeak: false,
   headerHeight: 48,
-  title: 'Ant Design Pro',
+  title: 'BioMiner',
   pwa: false,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/clinico-omics/logo.png',
   iconfontUrl: '',
 };
 

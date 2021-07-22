@@ -38,7 +38,7 @@
   },
   {
     name: 'miner-studio.stat-engine',
-    icon: 'table',
+    icon: 'experiment',
     path: '/stat-engine',
     component: './StatEngine',
   },

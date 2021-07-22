@@ -19,6 +19,7 @@ import { DataKey } from './data';
 import './index.less';
 
 import MarkdownViewer from './components/MarkdownViewer';
+import LogViewer from './components/LogViewer';
 
 const { TabPane } = Tabs;
 
@@ -29,6 +30,14 @@ const StatEngine: React.FC = () => {
     { title: 'Sample Data', data: [] },
   ]);
   const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
+  const [logLink, setLogLink] = useState<string>('');
+
+  const getLogLink = function (url: string) {
+    console.log('Log Link: ', url);
+    return `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md?random_str=${Math.random()
+      .toString(36)
+      .slice(-8)}`;
+  };
 
   const summaryOperations = (
     <Space>
@@ -64,7 +73,16 @@ const StatEngine: React.FC = () => {
     </Space>
   );
 
-  const logOperations = <Button icon={<ReloadOutlined />}>Refresh</Button>;
+  const logOperations = (
+    <Button
+      onClick={() => {
+        setLogLink(getLogLink(''));
+      }}
+      icon={<ReloadOutlined />}
+    >
+      Refresh
+    </Button>
+  );
 
   const getRightSpan = function (customLeftSpan: number): number {
     return 24 - customLeftSpan ? 24 - customLeftSpan : 24;
@@ -187,7 +205,7 @@ const StatEngine: React.FC = () => {
                   }
                   key="1"
                 >
-                  <Col id="graph-container">
+                  <Col id="graph-container" className="result-container">
                     <img
                       style={{ width: '100%' }}
                       src="https://s1.imagehub.cc/images/2020/08/31/82-JCQ9Fx-tuya.jpg"
@@ -203,7 +221,9 @@ const StatEngine: React.FC = () => {
                   }
                   key="2"
                 >
-                  <Col id="result-container">Comming Soon...</Col>
+                  <Col id="result-container" className="result-container">
+                    Comming Soon...
+                  </Col>
                 </TabPane>
               </Tabs>
               <Tabs
@@ -220,7 +240,7 @@ const StatEngine: React.FC = () => {
                   }
                   key="1"
                 >
-                  Tab 1
+                  <LogViewer url={logLink} />
                 </TabPane>
               </Tabs>
             </Col>
