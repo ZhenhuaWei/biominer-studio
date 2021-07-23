@@ -218,7 +218,7 @@ const StatEngine: React.FC = () => {
                 >
                   <Col
                     id="graph-container"
-                    className={`'result-container'
+                    className={`result-container
                       ${plotlyEditorMode === 'PlotlyEditor' ? 'full-screen' : 'no-full-screen'}`}
                   >
                     {plotlyEditorMode === 'PlotlyEditor' ? (

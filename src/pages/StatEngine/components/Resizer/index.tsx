@@ -15,7 +15,7 @@ const Resizer: React.FC<ResizerProps> = (props) => {
   return (
     <Col
       style={style}
-      className={`'resizer' ${className}`}
+      className={`resizer ${className}`}
       onMouseEnter={() => {
         HoverHandler(true);
       }}
