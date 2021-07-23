@@ -51,6 +51,10 @@
 
         .left__tabs__arguments {
           height: 50%;
+
+          .ant-tabs-content {
+            height: 100%;
+          }
         }
       }
 
@@ -58,39 +62,18 @@
         position: absolute;
         top: 0;
         right: -4px;
-        width: 8px;
-        height: 100%;
-        padding: 0 !important;
-        cursor: col-resize;
-
-        .resize-btn {
-          position: absolute;
-          left: -12px;
-          z-index: 1;
-        }
-
-        .btn-1 {
-          top: 40%;
-        }
-
-        .btn-2 {
-          top: calc(40% + 40px);
-        }
-
-        .btn-3 {
-          top: calc(40% + 80px);
-        }
-
-        .btn-4 {
-          top: calc(40% + 120px);
-        }
       }
     }
   }
 
   .right {
+    // Make the PlotlyEditor FullScreen
+    position: unset !important;
+
     .right__content {
       .right__tabs {
+        // Make the PlotlyEditor FullScreen
+        position: unset !important;
         width: 100%;
         height: calc(100vh - @right-tabs-height-offset);
         padding: 0 4px;
@@ -100,5 +83,20 @@
         }
       }
     }
+  }
+
+  .exit-editor {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    z-index: 10;
+  }
+
+  .full-screen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 }

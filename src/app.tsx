@@ -6,7 +6,12 @@ import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import {
+  BookOutlined,
+  LinkOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+} from '@ant-design/icons';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -24,6 +29,7 @@ export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
   settingDrawer?: SettingDrawerProps;
+  collapsed?: boolean;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -45,11 +51,13 @@ export async function getInitialState(): Promise<{
         hideCopyButton: true,
         hideHintAlert: true,
       },
+      collapsed: true,
     };
   }
   return {
     fetchUserInfo,
     settings: {},
+    collapsed: true,
   };
 }
 
@@ -106,9 +114,28 @@ export const request: RequestConfig = {
 };
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
-export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    collapsed: true,
+    collapsed: initialState?.collapsed,
+    collapsedButtonRender: () => {
+      return (
+        <div
+          onClick={() =>
+            // 点击自定义的按钮，修改initialState中的collapsed
+            setInitialState({
+              ...initialState,
+              collapsed: !initialState?.collapsed,
+            })
+          }
+          style={{
+            cursor: 'pointer',
+            fontSize: '16px',
+          }}
+        >
+          {initialState?.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        </div>
+      );
+    },
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {

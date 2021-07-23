@@ -1,7 +1,9 @@
+import { useIntl } from 'umi';
 import { GridContent } from '@ant-design/pro-layout';
 import { Col, Row, Tabs, Space, Button, Tooltip } from 'antd';
 
 import {
+  EditOutlined,
   InfoCircleOutlined,
   StopOutlined,
   DatabaseOutlined,
@@ -12,6 +14,7 @@ import {
   SnippetsOutlined,
   HistoryOutlined,
   IssuesCloseOutlined,
+  FullscreenExitOutlined,
 } from '@ant-design/icons';
 import React, { useState } from 'react';
 import { DataKey } from './data';
@@ -19,6 +22,13 @@ import './index.less';
 
 import MarkdownViewer from './components/MarkdownViewer';
 import LogViewer from './components/LogViewer';
+import Resizer from './components/Resizer';
+import ArgumentForm from './components/ArgumentForm';
+import PlotlyViewer from './components/PlotlyViewer';
+// import { plotlyData as defaultPlotlyData } from './components/PlotlyViewer/example';
+
+import { columns } from './components/ArgumentForm/data';
+import { langData } from './lang';
 
 const { TabPane } = Tabs;
 
@@ -29,41 +39,95 @@ const StatEngine: React.FC = () => {
     { title: 'Sample Data', data: [], key: 'sample-data' },
   ]);
   const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
+  const [logLink] = useState<string>('http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log');
+  const [markdownLink] = useState<string>(
+    // `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test-${getLocale()}.md`
+    `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md`,
+  );
+  // const [plotlyData, setPlotlyData] = useState<PlotlyData>(defaultPlotlyData);
+  const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
 
-  const getLogLink = function (url: string) {
-    console.log('Log Link: ', url);
-    return `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log?random_str=${Math.random()
-      .toString(36)
-      .slice(-8)}`;
+  const state = {
+    layout: {
+      annotations: [
+        {
+          text: 'simple annotation',
+          x: 0,
+          xref: 'paper',
+          y: 0,
+          yref: 'paper',
+        },
+      ],
+      title: 'simple example',
+      xaxis: {
+        title: 'time',
+      },
+      autosize: true,
+    },
+    data: [
+      {
+        marker: {
+          color: 'rgb(16, 32, 77)',
+        },
+        type: 'scatter',
+        x: [1, 2, 3],
+        y: [6, 2, 3],
+      },
+      {
+        name: 'bar chart example',
+        type: 'bar',
+        x: [1, 2, 3],
+        y: [6, 2, 3],
+      },
+    ],
   };
+
+  const intl = useIntl();
+  interface UIContext {
+    [key: string]: any;
+  }
+
+  const uiContext: UIContext = {};
+  Object.keys(langData).forEach((key) => {
+    uiContext[key] = intl.formatMessage(langData[key]);
+  });
 
   const summaryOperations = (
     <Space>
-      <Tooltip title="Reset Data and Arguments">
+      <Tooltip title={uiContext.resetTooltip}>
         <Button type="primary" danger icon={<StopOutlined />}>
-          Reset
+          {uiContext.reset}
         </Button>
       </Tooltip>
-      <Tooltip title="Load Example Data">
-        <Button icon={<DatabaseOutlined />}>{leftSpan >= 12 ? 'Example' : ''}</Button>
+      <Tooltip title={uiContext.exampleTooltip}>
+        <Button icon={<DatabaseOutlined />}>{leftSpan >= 12 ? `${uiContext.example}` : ''}</Button>
       </Tooltip>
-      <Tooltip title="Import Argument File">
-        <Button icon={<UploadOutlined />}>{leftSpan >= 12 ? 'Import' : ''}</Button>
+      <Tooltip title={uiContext.importTooltip}>
+        <Button icon={<UploadOutlined />}>{leftSpan >= 12 ? `${uiContext.import}` : ''}</Button>
       </Tooltip>
-      <Tooltip title="Export Argument File">
-        <Button icon={<DownloadOutlined />}>{leftSpan >= 12 ? 'Export' : ''}</Button>
+      <Tooltip title={uiContext.exportTooltip}>
+        <Button icon={<DownloadOutlined />}>{leftSpan >= 12 ? `${uiContext.export}` : ''}</Button>
       </Tooltip>
     </Space>
   );
 
-  const dataOperations = <Button icon={<ContainerOutlined />}>Load Data</Button>;
+  const dataOperations = <Button icon={<ContainerOutlined />}>{uiContext.loadData}</Button>;
 
   const resultOperations = (
     <Space>
-      <Tooltip title="List all charts">
-        <Button type="primary" icon={<BarChartOutlined />}>
-          Charts
+      <Tooltip title="Edit the Chart">
+        <Button
+          type="primary"
+          icon={<EditOutlined />}
+          onClick={() => {
+            setPlotlyEditorMode('PlotlyEditor');
+          }}
+        >
+          Edit
         </Button>
+      </Tooltip>
+      <Tooltip title="List all charts">
+        <Button icon={<BarChartOutlined />}>Charts</Button>
       </Tooltip>
       <Tooltip title="List all history">
         <Button icon={<HistoryOutlined />}>History</Button>
@@ -95,7 +159,7 @@ const StatEngine: React.FC = () => {
                   }
                   key="1"
                 >
-                  <MarkdownViewer url="http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md" />
+                  <MarkdownViewer url={markdownLink} />
                 </TabPane>
               </Tabs>
               <Tabs
@@ -104,7 +168,11 @@ const StatEngine: React.FC = () => {
                 tabBarExtraContent={dataOperations}
               >
                 <TabPane tab={<span>Arguments</span>} key="1">
-                  Tab 1
+                  <ArgumentForm
+                    labelSpan={4}
+                    height="calc(100% - 62px)"
+                    columns={columns}
+                  ></ArgumentForm>
                 </TabPane>
                 {dataKeys.map((dataKey, index) => {
                   return (
@@ -115,56 +183,12 @@ const StatEngine: React.FC = () => {
                 })}
               </Tabs>
             </Col>
-            <Col
+            <Resizer
               className="left__divider"
-              onMouseEnter={() => {
-                setResizeBtnActive(true);
-              }}
-              onMouseLeave={() => {
-                setResizeBtnActive(false);
-              }}
-            >
-              {resizeBtnActive ? (
-                <Space>
-                  <Button
-                    onClick={() => {
-                      setLeftSpan(12);
-                    }}
-                    className="resize-btn btn-1"
-                    size="small"
-                  >
-                    1:1
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setLeftSpan(16);
-                    }}
-                    className="resize-btn btn-2"
-                    size="small"
-                  >
-                    2:1
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setLeftSpan(8);
-                    }}
-                    className="resize-btn btn-3"
-                    size="small"
-                  >
-                    1:2
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setLeftSpan(24);
-                    }}
-                    className="resize-btn btn-4"
-                    size="small"
-                  >
-                    Full
-                  </Button>
-                </Space>
-              ) : null}
-            </Col>
+              HoverHandler={setResizeBtnActive}
+              ClickHandler={setLeftSpan}
+              btnActive={resizeBtnActive}
+            ></Resizer>
           </Row>
         </Col>
         <Col
@@ -192,11 +216,23 @@ const StatEngine: React.FC = () => {
                   }
                   key="1"
                 >
-                  <Col id="graph-container" className="result-container">
-                    <img
-                      style={{ width: '100%' }}
-                      src="https://s1.imagehub.cc/images/2020/08/31/82-JCQ9Fx-tuya.jpg"
-                    />
+                  <Col
+                    id="graph-container"
+                    className={`'result-container'
+                      ${plotlyEditorMode === 'PlotlyEditor' ? 'full-screen' : 'no-full-screen'}`}
+                  >
+                    {plotlyEditorMode === 'PlotlyEditor' ? (
+                      <Button
+                        className="exit-editor"
+                        onClick={() => {
+                          setPlotlyEditorMode('Plotly');
+                        }}
+                      >
+                        <FullscreenExitOutlined />
+                        Exit Editor
+                      </Button>
+                    ) : null}
+                    <PlotlyViewer state={state} mode={plotlyEditorMode}></PlotlyViewer>
                   </Col>
                 </TabPane>
                 <TabPane
@@ -221,7 +257,7 @@ const StatEngine: React.FC = () => {
                   }
                   key="3"
                 >
-                  <LogViewer height="570" url={getLogLink('')} />
+                  <LogViewer height="530" url={logLink} />
                 </TabPane>
               </Tabs>
             </Col>

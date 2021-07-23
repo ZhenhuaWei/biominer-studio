@@ -1,19 +1,19 @@
-export type DataKey = {
+export declare type DataKey = {
   title: String;
   key: String;
   data: Object[];
 };
 
-export type FieldItem = {};
+export declare type FieldItem = {};
 
-export type Example = {
+export declare type Example = {
   title: String;
   key: String;
   data: [];
   arguments: Object;
 };
 
-export type ChartData = {
+export declare type ChartData = {
   title: String;
   maintainer: String;
   description: String;
