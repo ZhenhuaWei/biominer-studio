@@ -40,8 +40,19 @@ export async function getNotices(options?: { [key: string]: any }) {
   });
 }
 
+/** 获取Plotly Data for Chart GET /api/chart */
+export async function getPlotlyData(id: string, params: {}, options?: { [key: string]: any }) {
+  return request<API.PlotlyChart>(`/api/figure/${id}`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 获取Chart列表 GET /api/charts */
-export async function charts(
+export async function getCharts(
   params: {
     // query
     /** 当前的页码 */

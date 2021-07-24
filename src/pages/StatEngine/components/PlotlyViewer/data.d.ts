@@ -46,3 +46,9 @@ export declare interface PlotlyEditorState {
   layout: Layout;
   frames?: Frames;
 }
+
+export declare type PlotlyChart = {
+  data: Data;
+  layout: Layout;
+  frames?: Frames;
+};

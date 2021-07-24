@@ -20,9 +20,9 @@ const ChartList: React.FC<ChartListProps> = (props) => {
     </Space>
   );
 
-  const showTotal = (num: number) => {
-    return `Total ${num} items`;
-  };
+  // const showTotal = (num: number) => {
+  //   return `Total ${num} items`;
+  // };
 
   const titleLink = (title: string, version: string) => {
     return <a className="title">{`${title}- ${version}`}</a>;
@@ -41,7 +41,6 @@ const ChartList: React.FC<ChartListProps> = (props) => {
         },
         pageSize: 10,
         total,
-        showTotal,
         showSizeChanger: true,
         showQuickJumper: true,
       }}

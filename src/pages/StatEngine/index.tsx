@@ -17,7 +17,7 @@ import {
   IssuesCloseOutlined,
   FullscreenExitOutlined,
 } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './index.less';
 
 // Custom Component
@@ -31,48 +31,14 @@ import ChartList from './components/ChartList';
 // Custom DataType
 import { langData } from './lang';
 import { DataKey, ChartData, DataItem } from './components/ChartList/data';
-import { PlotlyEditorState } from './components/PlotlyViewer/data';
+import { PlotlyChart } from './components/PlotlyViewer/data';
 
 // Custom Example Data
-import chartExampleData from './components/ChartList/exampleData';
-import { useEffect } from 'react';
+
+// API Endpoint
+import { getCharts, getPlotlyData } from '@/services/ant-design-pro/api';
 
 const { TabPane } = Tabs;
-
-const plotlyExampleData = {
-  layout: {
-    annotations: [
-      {
-        text: 'simple annotation',
-        x: 0,
-        xref: 'paper',
-        y: 0,
-        yref: 'paper',
-      },
-    ],
-    title: 'simple example',
-    xaxis: {
-      title: 'time',
-    },
-    autosize: true,
-  },
-  data: [
-    {
-      marker: {
-        color: 'rgb(16, 32, 77)',
-      },
-      type: 'scatter',
-      x: [1, 2, 3],
-      y: [6, 2, 3],
-    },
-    {
-      name: 'bar chart example',
-      type: 'bar',
-      x: [1, 2, 3],
-      y: [6, 2, 3],
-    },
-  ],
-};
 
 const StatEngine: React.FC = () => {
   const [leftSpan, setLeftSpan] = useState<number>(12);
@@ -83,14 +49,18 @@ const StatEngine: React.FC = () => {
   );
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
-  const [plotlyData, setPlotlyData] = useState<PlotlyEditorState>({ data: [], layout: {} });
+  const [plotlyData, setPlotlyData] = useState<PlotlyChart>({ data: [], layout: {} });
   const [chartsVisible, setChartsVisible] = useState<boolean>(false);
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
   const [charts, setCharts] = useState<ChartData[]>([]);
+  const [chartsTotal, setChartsTotal] = useState<number>(0);
 
   useEffect(() => {
-    setCharts(chartExampleData);
-  });
+    getCharts({}).then((response) => {
+      setCharts(response.data);
+      setChartsTotal(response.total);
+    });
+  }, []);
 
   const selectItem = (chart: ChartData) => {
     // README
@@ -102,10 +72,12 @@ const StatEngine: React.FC = () => {
     // Reset Argument
     setArgumentColumns(chart.fields);
     // Initialize Plotly
-    setPlotlyData({
-      ...plotlyData,
-      layout: plotlyExampleData.layout,
-      data: plotlyExampleData.data,
+    getPlotlyData('fig1', {}).then((response) => {
+      setPlotlyData({
+        ...plotlyData,
+        layout: response.layout,
+        data: response.data,
+      });
     });
     // Close Charts Drawer
     setChartsVisible(false);
@@ -172,7 +144,9 @@ const StatEngine: React.FC = () => {
         </Button>
       </Tooltip>
       <Tooltip title="List all history">
-        <Button icon={<HistoryOutlined />}>History</Button>
+        <Button disabled icon={<HistoryOutlined />}>
+          History
+        </Button>
       </Tooltip>
     </Space>
   );
@@ -307,7 +281,7 @@ const StatEngine: React.FC = () => {
         </Col>
       </Row>
       <Drawer
-        title={`Charts (${charts.length})`}
+        title={`Charts (${chartsTotal})`}
         placement="right"
         closable
         width="50%"
@@ -316,7 +290,7 @@ const StatEngine: React.FC = () => {
         }}
         visible={chartsVisible}
       >
-        <ChartList onClickItem={selectItem} charts={charts} total={charts.length}></ChartList>
+        <ChartList onClickItem={selectItem} charts={charts} total={chartsTotal}></ChartList>
       </Drawer>
     </GridContent>
   );
