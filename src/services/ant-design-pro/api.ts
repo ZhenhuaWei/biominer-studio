@@ -40,6 +40,26 @@ export async function getNotices(options?: { [key: string]: any }) {
   });
 }
 
+/** 获取Chart列表 GET /api/charts */
+export async function charts(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.ChartList>('/api/charts', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 获取规则列表 GET /api/rule */
 export async function rule(
   params: {

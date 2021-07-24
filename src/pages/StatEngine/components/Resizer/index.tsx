@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Space, Button, Col } from 'antd';
 import './index.less';
 
@@ -11,6 +12,8 @@ export type ResizerProps = {
 
 const Resizer: React.FC<ResizerProps> = (props) => {
   const { HoverHandler, ClickHandler, btnActive, style, className } = props;
+
+  console.log('Resizer updated');
 
   return (
     <Col
@@ -67,4 +70,4 @@ const Resizer: React.FC<ResizerProps> = (props) => {
   );
 };
 
-export default Resizer;
+export default memo(Resizer);

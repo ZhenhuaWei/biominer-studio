@@ -477,6 +477,124 @@
           }
         }
       },
+      "TagItem": {
+        "type": "string"
+      },
+      "FieldItem": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "dataIndex": {
+            "type": "string"
+          },
+          "width": {
+            "type": "string"
+          }
+        }
+      },
+      "DataKeyItem": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array"
+          }
+        }
+      },
+      "ExampleItem": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array"
+          },
+          "arguments": {
+            "type": "object"
+          }
+        }
+      },
+      "ChartListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "maintainer": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "readme": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItem"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldItem"
+            }
+          },
+          "dataKeys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataKeyItem"
+            }
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataKeyItem"
+            }
+          }
+        }
+      },
+      "ChartList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartListItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "列表的内容总数",
+            "format": "int32"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
       "FakeCaptcha": {
         "type": "object",
         "properties": {

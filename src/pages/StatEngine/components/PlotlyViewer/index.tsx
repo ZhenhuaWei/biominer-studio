@@ -4,22 +4,7 @@ import PlotlyChart from 'react-plotly.js';
 import PlotlyEditor from 'react-chart-editor';
 import 'react-chart-editor/lib/react-chart-editor.css';
 import './index.less';
-
-export interface IGraphDivData {
-  [key: string]: any;
-}
-
-export type Data = IGraphDivData[];
-
-export type Layout = {};
-
-export type Frames = any[];
-
-export interface PlotlyEditorState {
-  data: Data;
-  layout: Layout;
-  frames?: Frames;
-}
+import { PlotlyEditorState, Data, Layout, Frames } from './data';
 
 export interface ChartEditorProps {
   state?: PlotlyEditorState;
@@ -33,7 +18,7 @@ export interface ChartEditorState {
   frames: Frames;
 }
 
-export default class ChartEditor extends React.Component<ChartEditorProps, ChartEditorState> {
+export default class ChartEditor extends React.PureComponent<ChartEditorProps, ChartEditorState> {
   constructor(props: ChartEditorProps) {
     super(props);
     const initialState: ChartEditorState = {
@@ -46,7 +31,13 @@ export default class ChartEditor extends React.Component<ChartEditorProps, Chart
   }
 
   static getDerivedStateFromProps(nextProps: ChartEditorProps, prevState?: ChartEditorState) {
-    return prevState;
+    // return prevState;
+    console.log('PlotlyViewer: ', nextProps, prevState);
+    return {
+      data: nextProps.state?.data,
+      layout: nextProps.state?.layout,
+      frames: nextProps.state?.frames,
+    };
   }
 
   handleUpdate = (data: Data, layout: Layout, frames: Frames) => {
@@ -88,7 +79,8 @@ export default class ChartEditor extends React.Component<ChartEditorProps, Chart
       showTips: false,
       responsive: true,
     };
-    console.log('Mode: ', this.props.mode);
+
+    console.log('PlotlyViewer updated: ', this.props.mode);
 
     // mode: ["Plotly", "PlotlyEditor"]
     return this.props.mode === 'Plotly' ? (

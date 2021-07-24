@@ -1,6 +1,7 @@
 import { useIntl } from 'umi';
 import { GridContent } from '@ant-design/pro-layout';
-import { Col, Row, Tabs, Space, Button, Tooltip } from 'antd';
+import { Col, Row, Tabs, Space, Button, Tooltip, Drawer } from 'antd';
+import type { ProFormColumnsType } from '@ant-design/pro-form';
 
 import {
   EditOutlined,
@@ -17,69 +18,97 @@ import {
   FullscreenExitOutlined,
 } from '@ant-design/icons';
 import React, { useState } from 'react';
-import { DataKey } from './data';
 import './index.less';
 
+// Custom Component
 import MarkdownViewer from './components/MarkdownViewer';
 import LogViewer from './components/LogViewer';
 import Resizer from './components/Resizer';
 import ArgumentForm from './components/ArgumentForm';
 import PlotlyViewer from './components/PlotlyViewer';
-// import { plotlyData as defaultPlotlyData } from './components/PlotlyViewer/example';
+import ChartList from './components/ChartList';
 
-import { columns } from './components/ArgumentForm/data';
+// Custom DataType
 import { langData } from './lang';
+import { DataKey, ChartData, DataItem } from './components/ChartList/data';
+import { PlotlyEditorState } from './components/PlotlyViewer/data';
+
+// Custom Example Data
+import chartExampleData from './components/ChartList/exampleData';
+import { useEffect } from 'react';
 
 const { TabPane } = Tabs;
 
-const StatEngine: React.FC = () => {
-  const [leftSpan, setLeftSpan] = useState<number>(12);
-  const [dataKeys] = useState<DataKey[]>([
-    { title: 'Data', data: [], key: 'data' },
-    { title: 'Sample Data', data: [], key: 'sample-data' },
-  ]);
-  const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
-  const [logLink] = useState<string>('http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log');
-  const [markdownLink] = useState<string>(
-    // `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test-${getLocale()}.md`
-    `http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md`,
-  );
-  // const [plotlyData, setPlotlyData] = useState<PlotlyData>(defaultPlotlyData);
-  const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
-
-  const state = {
-    layout: {
-      annotations: [
-        {
-          text: 'simple annotation',
-          x: 0,
-          xref: 'paper',
-          y: 0,
-          yref: 'paper',
-        },
-      ],
-      title: 'simple example',
-      xaxis: {
-        title: 'time',
-      },
-      autosize: true,
-    },
-    data: [
+const plotlyExampleData = {
+  layout: {
+    annotations: [
       {
-        marker: {
-          color: 'rgb(16, 32, 77)',
-        },
-        type: 'scatter',
-        x: [1, 2, 3],
-        y: [6, 2, 3],
-      },
-      {
-        name: 'bar chart example',
-        type: 'bar',
-        x: [1, 2, 3],
-        y: [6, 2, 3],
+        text: 'simple annotation',
+        x: 0,
+        xref: 'paper',
+        y: 0,
+        yref: 'paper',
       },
     ],
+    title: 'simple example',
+    xaxis: {
+      title: 'time',
+    },
+    autosize: true,
+  },
+  data: [
+    {
+      marker: {
+        color: 'rgb(16, 32, 77)',
+      },
+      type: 'scatter',
+      x: [1, 2, 3],
+      y: [6, 2, 3],
+    },
+    {
+      name: 'bar chart example',
+      type: 'bar',
+      x: [1, 2, 3],
+      y: [6, 2, 3],
+    },
+  ],
+};
+
+const StatEngine: React.FC = () => {
+  const [leftSpan, setLeftSpan] = useState<number>(12);
+  const [dataKeys, setDataKeys] = useState<DataKey[]>([]);
+  const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
+  const [logLink, setLogLink] = useState<string>(
+    'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log',
+  );
+  const [markdownLink, setMarkdownLink] = useState<string>('');
+  const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
+  const [plotlyData, setPlotlyData] = useState<PlotlyEditorState>({ data: [], layout: {} });
+  const [chartsVisible, setChartsVisible] = useState<boolean>(false);
+  const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
+  const [charts, setCharts] = useState<ChartData[]>([]);
+
+  useEffect(() => {
+    setCharts(chartExampleData);
+  });
+
+  const selectItem = (chart: ChartData) => {
+    // README
+    setMarkdownLink(chart.readme);
+    // Reset Log Container
+    setLogLink('');
+    // Reset DataKey
+    setDataKeys(chart.dataKeys);
+    // Reset Argument
+    setArgumentColumns(chart.fields);
+    // Initialize Plotly
+    setPlotlyData({
+      ...plotlyData,
+      layout: plotlyExampleData.layout,
+      data: plotlyExampleData.data,
+    });
+    // Close Charts Drawer
+    setChartsVisible(false);
   };
 
   const intl = useIntl();
@@ -95,18 +124,24 @@ const StatEngine: React.FC = () => {
   const summaryOperations = (
     <Space>
       <Tooltip title={uiContext.resetTooltip}>
-        <Button type="primary" danger icon={<StopOutlined />}>
+        <Button disabled type="primary" danger icon={<StopOutlined />}>
           {uiContext.reset}
         </Button>
       </Tooltip>
       <Tooltip title={uiContext.exampleTooltip}>
-        <Button icon={<DatabaseOutlined />}>{leftSpan >= 12 ? `${uiContext.example}` : ''}</Button>
+        <Button disabled icon={<DatabaseOutlined />}>
+          {leftSpan >= 12 ? `${uiContext.example}` : ''}
+        </Button>
       </Tooltip>
       <Tooltip title={uiContext.importTooltip}>
-        <Button icon={<UploadOutlined />}>{leftSpan >= 12 ? `${uiContext.import}` : ''}</Button>
+        <Button disabled icon={<UploadOutlined />}>
+          {leftSpan >= 12 ? `${uiContext.import}` : ''}
+        </Button>
       </Tooltip>
       <Tooltip title={uiContext.exportTooltip}>
-        <Button icon={<DownloadOutlined />}>{leftSpan >= 12 ? `${uiContext.export}` : ''}</Button>
+        <Button disabled icon={<DownloadOutlined />}>
+          {leftSpan >= 12 ? `${uiContext.export}` : ''}
+        </Button>
       </Tooltip>
     </Space>
   );
@@ -127,7 +162,14 @@ const StatEngine: React.FC = () => {
         </Button>
       </Tooltip>
       <Tooltip title="List all charts">
-        <Button icon={<BarChartOutlined />}>Charts</Button>
+        <Button
+          onClick={() => {
+            setChartsVisible(true);
+          }}
+          icon={<BarChartOutlined />}
+        >
+          Charts
+        </Button>
       </Tooltip>
       <Tooltip title="List all history">
         <Button icon={<HistoryOutlined />}>History</Button>
@@ -171,7 +213,7 @@ const StatEngine: React.FC = () => {
                   <ArgumentForm
                     labelSpan={4}
                     height="calc(100% - 62px)"
-                    columns={columns}
+                    columns={argumentColumns}
                   ></ArgumentForm>
                 </TabPane>
                 {dataKeys.map((dataKey, index) => {
@@ -232,7 +274,7 @@ const StatEngine: React.FC = () => {
                         Exit Editor
                       </Button>
                     ) : null}
-                    <PlotlyViewer state={state} mode={plotlyEditorMode}></PlotlyViewer>
+                    <PlotlyViewer state={plotlyData} mode={plotlyEditorMode}></PlotlyViewer>
                   </Col>
                 </TabPane>
                 <TabPane
@@ -264,6 +306,18 @@ const StatEngine: React.FC = () => {
           </Row>
         </Col>
       </Row>
+      <Drawer
+        title={`Charts (${charts.length})`}
+        placement="right"
+        closable
+        width="50%"
+        onClose={() => {
+          setChartsVisible(false);
+        }}
+        visible={chartsVisible}
+      >
+        <ChartList onClickItem={selectItem} charts={charts} total={charts.length}></ChartList>
+      </Drawer>
     </GridContent>
   );
 };

@@ -1,5 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
+import { ChartData } from '../../pages/StatEngine/components/ChartList/data';
 
 declare namespace API {
   type CurrentUser = {
@@ -52,6 +53,12 @@ declare namespace API {
   type RuleList = {
     data?: RuleListItem[];
     /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  };
+
+  type ChartList = {
+    data?: ChartData[];
     total?: number;
     success?: boolean;
   };

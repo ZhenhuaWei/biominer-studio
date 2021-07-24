@@ -1,6 +1,7 @@
 import { LazyLog } from 'react-lazylog';
-import { Space, Col, Button } from 'antd';
+import { Space, Col, Button, Empty } from 'antd';
 import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
+import { memo } from 'react';
 
 export type LogProps = {
   url: string;
@@ -17,12 +18,16 @@ const LogViewer: React.FC<LogProps> = (props) => {
     </Space>
   );
 
-  return (
+  console.log('LogViewer updated');
+
+  return url ? (
     <Col>
       <LazyLog height={height} url={url} enableSearch extraLines={1} follow />
       {buttons}
     </Col>
+  ) : (
+    <Empty />
   );
 };
 
-export default LogViewer;
+export default memo(LogViewer);

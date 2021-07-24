@@ -30,3 +30,19 @@ declare module 'plotly.js/dist/plotly' {
 
   export = Plotly;
 }
+
+export interface IGraphDivData {
+  [key: string]: any;
+}
+
+export declare type Data = IGraphDivData[];
+
+export declare type Layout = {};
+
+export declare type Frames = any[];
+
+export declare interface PlotlyEditorState {
+  data: Data;
+  layout: Layout;
+  frames?: Frames;
+}
