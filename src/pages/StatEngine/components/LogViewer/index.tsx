@@ -1,3 +1,4 @@
+// @ts-ignore
 import { LazyLog } from 'react-lazylog';
 import { Space, Col, Button, Empty } from 'antd';
 import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';

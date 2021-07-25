@@ -27,6 +27,7 @@ import ArgumentForm from './components/ArgumentForm';
 import PlotlyViewer from './components/PlotlyViewer';
 import ChartList from './components/ChartList';
 import ImportForm from './components/ImportForm';
+import DataTable from './components/DataTable';
 
 // Custom DataType
 import { Bound } from './data';
@@ -41,6 +42,10 @@ import { langData } from './lang';
 import { getCharts, getPlotlyData } from '@/services/ant-design-pro/api';
 
 const logExample = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log';
+const dataTable = [
+  { a: 1, b: 2 },
+  { a: 2, b: 3 },
+];
 
 const { TabPane } = Tabs;
 
@@ -57,7 +62,18 @@ const StatEngine: React.FC = () => {
   // const [currentChart, setCurrentChart] = useState<ChartData | null>(null);
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
-  const [dataKeys, setDataKeys] = useState<DataKey[]>([]);
+  const [dataKeys, setDataKeys] = useState<DataKey[]>([
+    {
+      title: 'Data',
+      key: 'data',
+      data: [],
+    },
+    {
+      title: 'Sample Data',
+      key: 'sample-data',
+      data: [],
+    },
+  ]);
   const [plotlyData, setPlotlyData] = useState<PlotlyChart>({ data: [], layout: {} });
   const [logLink, setLogLink] = useState<string>(logExample);
 
@@ -242,7 +258,11 @@ const StatEngine: React.FC = () => {
                 {dataKeys.map((dataKey) => {
                   return (
                     <TabPane tab={<span>{dataKey.title}</span>} key={dataKey.key}>
-                      Tab 1
+                      <DataTable
+                        data={dataTable}
+                        height="calc(100vh - 145px)"
+                        width="100%"
+                      ></DataTable>
                     </TabPane>
                   );
                 })}

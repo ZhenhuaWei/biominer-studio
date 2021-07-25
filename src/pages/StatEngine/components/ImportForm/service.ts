@@ -1,4 +1,5 @@
 // import v from 'voca';
+// @ts-ignore
 import Papa from 'papaparse';
 import { PapaTableData } from './data';
 
