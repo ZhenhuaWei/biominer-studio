@@ -130,7 +130,7 @@ const StatEngine: React.FC = () => {
             setPlotlyEditorMode('PlotlyEditor');
           }}
         >
-          Edit
+          {uiContext.edit}
         </Button>
       </Tooltip>
       <Tooltip title="List all charts">
@@ -140,12 +140,12 @@ const StatEngine: React.FC = () => {
           }}
           icon={<BarChartOutlined />}
         >
-          Charts
+          {uiContext.charts}
         </Button>
       </Tooltip>
       <Tooltip title="List all history">
         <Button disabled icon={<HistoryOutlined />}>
-          History
+          {uiContext.history}
         </Button>
       </Tooltip>
     </Space>
@@ -170,7 +170,7 @@ const StatEngine: React.FC = () => {
                   tab={
                     <span>
                       <InfoCircleOutlined />
-                      Summary
+                      {uiContext.summary}
                     </span>
                   }
                   key="1"
@@ -183,7 +183,7 @@ const StatEngine: React.FC = () => {
                 className="left__tabs__arguments"
                 tabBarExtraContent={dataOperations}
               >
-                <TabPane tab={<span>Arguments</span>} key="1">
+                <TabPane tab={<span>{uiContext.arguments}</span>} key="1">
                   <ArgumentForm
                     labelSpan={4}
                     height="calc(100% - 62px)"
@@ -227,7 +227,7 @@ const StatEngine: React.FC = () => {
                   tab={
                     <span>
                       <BarChartOutlined />
-                      Figure
+                      {uiContext.figure}
                     </span>
                   }
                   key="1"
@@ -255,7 +255,7 @@ const StatEngine: React.FC = () => {
                   tab={
                     <span>
                       <SnippetsOutlined />
-                      Results
+                      {uiContext.results}
                     </span>
                   }
                   key="2"
@@ -268,7 +268,7 @@ const StatEngine: React.FC = () => {
                   tab={
                     <span>
                       <IssuesCloseOutlined />
-                      Log
+                      {uiContext.log}
                     </span>
                   }
                   key="3"

@@ -1,10 +1,14 @@
 import * as React from 'react';
+import { getLocale } from 'umi';
 import * as plotly from 'plotly.js/dist/plotly';
 import PlotlyChart from 'react-plotly.js';
 import PlotlyEditor from 'react-chart-editor';
+
+import * as localeDictionary from 'plotly.js/lib/locales/zh-cn';
+import { PlotlyEditorState, Data, Layout, Frames } from './data';
+
 import 'react-chart-editor/lib/react-chart-editor.css';
 import './index.less';
-import { PlotlyEditorState, Data, Layout, Frames } from './data';
 
 export interface ChartEditorProps {
   state?: PlotlyEditorState;
@@ -78,6 +82,9 @@ export default class ChartEditor extends React.PureComponent<ChartEditorProps, C
       displayModeBar: true,
       showTips: false,
       responsive: true,
+      // @ts-ignore
+      locales: { 'zh-CN': localeDictionary },
+      locale: getLocale(),
     };
 
     console.log('PlotlyViewer updated: ', this.props.mode);

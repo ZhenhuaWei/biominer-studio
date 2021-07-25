@@ -8,4 +8,12 @@ export default {
   'stat-engine.summary-operations.export': 'Export',
   'stat-engine.summary-operations.export-tooltip': 'Export Arguments as a File',
   'stat-engine.data-operations.load-data': 'Load Data',
+  'stat-engine.summary': 'Summary',
+  'stat-engine.arguments': 'Arguments',
+  'stat-engine.figure': 'Figure',
+  'stat-engine.results': 'Results',
+  'stat-engine.log': 'Log',
+  'stat-engine.result-operations.edit': 'Edit',
+  'stat-engine.result-operations.charts': 'Charts',
+  'stat-engine.result-operations.history': 'History',
 };
