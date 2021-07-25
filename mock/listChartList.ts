@@ -25,101 +25,30 @@ const genList = (current: number, pageSize: number) => {
           formItemProps: {
             rules: [{ required: true, message: '此项为必填项' }],
           },
-          width: 'm',
         },
         {
           title: '状态',
           dataIndex: 'state',
           valueType: 'select',
-          width: 'm',
         },
-        { title: '标签', dataIndex: 'labels', width: 'm' },
+        { title: '标签', dataIndex: 'labels' },
         {
           title: '创建时间',
           key: 'showTime',
           dataIndex: 'createName',
           valueType: 'date',
         },
-        {
-          title: '分组',
-          valueType: 'group',
-          columns: [
-            {
-              title: '状态',
-              dataIndex: 'groupState',
-              valueType: 'select',
-              width: 'xs',
-            },
-            {
-              title: '标题',
-              width: 'md',
-              dataIndex: 'groupTitle',
-              formItemProps: {
-                rules: [{ required: true, message: '此项为必填项' }],
-              },
-            },
-          ],
-        },
-        {
-          title: '列表',
-          valueType: 'formList',
-          dataIndex: 'list',
-          initialValue: [{ state: 'all', title: '标题' }],
-          columns: [
-            {
-              valueType: 'group',
-              columns: [
-                {
-                  title: '状态',
-                  dataIndex: 'state',
-                  valueType: 'select',
-                  width: 'xs',
-                },
-                {
-                  title: '标题',
-                  dataIndex: 'title',
-                  formItemProps: {
-                    rules: [{ required: true, message: '此项为必填项' }],
-                  },
-                  width: 'm',
-                },
-              ],
-            },
-          ],
-        },
-        {
-          title: 'FormSet',
-          valueType: 'formSet',
-          dataIndex: 'formSet',
-          columns: [
-            {
-              title: '状态',
-              dataIndex: 'groupState',
-              valueType: 'select',
-              width: 'xs',
-            },
-            {
-              title: '标题',
-              dataIndex: 'groupTitle',
-              tip: '标题过长会自动收缩',
-              formItemProps: {
-                rules: [{ required: true, message: '此项为必填项' }],
-              },
-              width: 'm',
-            },
-          ],
-        },
         { title: '创建时间', dataIndex: 'created_at', valueType: 'dateRange' },
       ],
       dataKeys: [
         {
           title: 'Data',
-          key: '',
+          key: 'data',
           data: [],
         },
         {
           title: 'Sample Data',
-          key: '',
+          key: 'sample-data',
           data: [],
         },
       ],
@@ -137,7 +66,7 @@ const genList = (current: number, pageSize: number) => {
   return chartListDataSource;
 };
 
-let chartListDataSource = genList(1, 100);
+let chartListDataSource = genList(1, 1);
 
 function getCharts(req: Request, res: Response, u: string) {
   let realUrl = u;

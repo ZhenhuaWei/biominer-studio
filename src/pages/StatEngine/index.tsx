@@ -1,15 +1,14 @@
 import { useIntl } from 'umi';
 import { GridContent } from '@ant-design/pro-layout';
-import { Col, Row, Tabs, Space, Button, Tooltip, Drawer } from 'antd';
+import { Col, Row, Tabs, Space, Button, Tooltip, Drawer, Modal } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-form';
+import Draggable from 'react-draggable';
 
 import {
   EditOutlined,
   InfoCircleOutlined,
   StopOutlined,
   DatabaseOutlined,
-  UploadOutlined,
-  DownloadOutlined,
   BarChartOutlined,
   ContainerOutlined,
   SnippetsOutlined,
@@ -27,33 +26,69 @@ import Resizer from './components/Resizer';
 import ArgumentForm from './components/ArgumentForm';
 import PlotlyViewer from './components/PlotlyViewer';
 import ChartList from './components/ChartList';
+import ImportForm from './components/ImportForm';
 
 // Custom DataType
-import { langData } from './lang';
+import { Bound } from './data';
+import { TableData } from './components/ImportForm/data';
 import { DataKey, ChartData, DataItem } from './components/ChartList/data';
 import { PlotlyChart } from './components/PlotlyViewer/data';
 
-// Custom Example Data
+// Custom Data
+import { langData } from './lang';
 
 // API Endpoint
 import { getCharts, getPlotlyData } from '@/services/ant-design-pro/api';
+
+const logExample = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log';
 
 const { TabPane } = Tabs;
 
 const StatEngine: React.FC = () => {
   const [leftSpan, setLeftSpan] = useState<number>(12);
-  const [dataKeys, setDataKeys] = useState<DataKey[]>([]);
-  const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
-  const [logLink, setLogLink] = useState<string>(
-    'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log',
-  );
-  const [markdownLink, setMarkdownLink] = useState<string>('');
   const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
-  const [plotlyData, setPlotlyData] = useState<PlotlyChart>({ data: [], layout: {} });
   const [chartsVisible, setChartsVisible] = useState<boolean>(false);
+  const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
+  const [currentActiveKey, setCurrentActiveKey] = useState<string>('summary');
+
+  const [inDataContext, setInDataContext] = useState<boolean>(false);
+
+  // Chart
+  // const [currentChart, setCurrentChart] = useState<ChartData | null>(null);
+  const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
+  const [dataKeys, setDataKeys] = useState<DataKey[]>([]);
+  const [plotlyData, setPlotlyData] = useState<PlotlyChart>({ data: [], layout: {} });
+  const [logLink, setLogLink] = useState<string>(logExample);
+
+  // Charts Drawer
   const [charts, setCharts] = useState<ChartData[]>([]);
   const [chartsTotal, setChartsTotal] = useState<number>(0);
+
+  // Modal
+  const [modalDisabled, setModalDisabled] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [bounds, setBounds] = useState<Bound>({ left: 0, top: 0, bottom: 0, right: 0 });
+  const draggleRef: React.RefObject<HTMLDivElement> = React.createRef();
+
+  const onModalStart = (event: any, uiData: any) => {
+    const { clientWidth, clientHeight } = window?.document?.documentElement;
+    const targetRect = draggleRef?.current?.getBoundingClientRect();
+    if (targetRect) {
+      setBounds({
+        left: -targetRect?.left + uiData?.x,
+        right: clientWidth - (targetRect?.right - uiData?.x),
+        top: -targetRect?.top + uiData?.y,
+        bottom: clientHeight - (targetRect?.bottom - uiData?.y),
+      });
+    }
+  };
+
+  const onLoadData = (data: TableData) => {
+    console.log('onLoadData: ', data);
+    // Close the modal
+    setModalVisible(false);
+  };
 
   useEffect(() => {
     getCharts({}).then((response) => {
@@ -63,14 +98,13 @@ const StatEngine: React.FC = () => {
   }, []);
 
   const selectItem = (chart: ChartData) => {
+    // setCurrentChart(chart);
     // README
     setMarkdownLink(chart.readme);
-    // Reset Log Container
-    setLogLink('');
-    // Reset DataKey
-    setDataKeys(chart.dataKeys);
     // Reset Argument
     setArgumentColumns(chart.fields);
+    // Reset DataKey
+    setDataKeys(chart.dataKeys);
     // Initialize Plotly
     getPlotlyData('fig1', {}).then((response) => {
       setPlotlyData({
@@ -79,8 +113,35 @@ const StatEngine: React.FC = () => {
         data: response.data,
       });
     });
+    // Reset Log Container
+    setLogLink('');
+
     // Close Charts Drawer
     setChartsVisible(false);
+  };
+
+  const isInDataContext = (key: string) => {
+    console.log('isInDataContext: ', dataKeys, currentActiveKey);
+
+    if (dataKeys) {
+      const allKeys = dataKeys.map((item) => {
+        return item.key;
+      });
+
+      console.log('allKeys: ', allKeys, dataKeys, currentActiveKey, key);
+
+      return allKeys.includes(key) || false;
+    }
+
+    return false;
+  };
+
+  const changeDataTab = (key: string) => {
+    if (key !== 'arguments') {
+      setInDataContext(isInDataContext(key));
+    }
+
+    setCurrentActiveKey(key);
   };
 
   const intl = useIntl();
@@ -105,20 +166,17 @@ const StatEngine: React.FC = () => {
           {leftSpan >= 12 ? `${uiContext.example}` : ''}
         </Button>
       </Tooltip>
-      <Tooltip title={uiContext.importTooltip}>
-        <Button disabled icon={<UploadOutlined />}>
-          {leftSpan >= 12 ? `${uiContext.import}` : ''}
-        </Button>
-      </Tooltip>
-      <Tooltip title={uiContext.exportTooltip}>
-        <Button disabled icon={<DownloadOutlined />}>
-          {leftSpan >= 12 ? `${uiContext.export}` : ''}
-        </Button>
-      </Tooltip>
+      <Button
+        disabled={!inDataContext}
+        onClick={() => {
+          setModalVisible(true);
+        }}
+        icon={<ContainerOutlined />}
+      >
+        {uiContext.loadData}
+      </Button>
     </Space>
   );
-
-  const dataOperations = <Button icon={<ContainerOutlined />}>{uiContext.loadData}</Button>;
 
   const resultOperations = (
     <Space>
@@ -162,8 +220,12 @@ const StatEngine: React.FC = () => {
           <Row className="left__content">
             <Col className="left__tabs">
               <Tabs
-                defaultActiveKey="1"
-                className="left__tabs__summary"
+                onChange={(key) => {
+                  changeDataTab(key);
+                }}
+                activeKey={currentActiveKey}
+                defaultActiveKey="summary"
+                className="left__tabs__arguments"
                 tabBarExtraContent={summaryOperations}
               >
                 <TabPane
@@ -173,30 +235,24 @@ const StatEngine: React.FC = () => {
                       {uiContext.summary}
                     </span>
                   }
-                  key="1"
+                  key="summary"
                 >
                   <MarkdownViewer url={markdownLink} />
                 </TabPane>
-              </Tabs>
-              <Tabs
-                defaultActiveKey="1"
-                className="left__tabs__arguments"
-                tabBarExtraContent={dataOperations}
-              >
-                <TabPane tab={<span>{uiContext.arguments}</span>} key="1">
-                  <ArgumentForm
-                    labelSpan={4}
-                    height="calc(100% - 62px)"
-                    columns={argumentColumns}
-                  ></ArgumentForm>
-                </TabPane>
-                {dataKeys.map((dataKey, index) => {
+                {dataKeys.map((dataKey) => {
                   return (
-                    <TabPane tab={<span>{dataKey.title}</span>} key={index + 2}>
+                    <TabPane tab={<span>{dataKey.title}</span>} key={dataKey.key}>
                       Tab 1
                     </TabPane>
                   );
                 })}
+                <TabPane tab={<span>{uiContext.arguments}</span>} key="arguments">
+                  <ArgumentForm
+                    layout="vertical"
+                    height="calc(100% - 62px)"
+                    columns={argumentColumns}
+                  ></ArgumentForm>
+                </TabPane>
               </Tabs>
             </Col>
             <Resizer
@@ -292,6 +348,53 @@ const StatEngine: React.FC = () => {
       >
         <ChartList onClickItem={selectItem} charts={charts} total={chartsTotal}></ChartList>
       </Drawer>
+      <Modal
+        className="import-form-modal"
+        width="50%"
+        title={
+          <div
+            style={{
+              width: '100%',
+              cursor: 'move',
+            }}
+            onMouseOver={() => {
+              if (modalDisabled) {
+                setModalDisabled(false);
+              }
+            }}
+            onMouseOut={() => {
+              setModalDisabled(true);
+            }}
+            // fix eslintjsx-a11y/mouse-events-have-key-events
+            // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/mouse-events-have-key-events.md
+            onFocus={() => {}}
+            onBlur={() => {}}
+            // end
+          >
+            Data Loader
+          </div>
+        }
+        visible={modalVisible}
+        footer={null}
+        onCancel={() => {
+          setModalVisible(false);
+        }}
+        modalRender={(modal) => (
+          <Draggable
+            disabled={modalDisabled}
+            bounds={bounds}
+            onStart={(event, uiData) => onModalStart(event, uiData)}
+          >
+            <div ref={draggleRef}>{modal}</div>
+          </Draggable>
+        )}
+      >
+        <ImportForm
+          onLoad={(data: TableData) => {
+            onLoadData(data);
+          }}
+        ></ImportForm>
+      </Modal>
     </GridContent>
   );
 };

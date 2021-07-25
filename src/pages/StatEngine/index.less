@@ -34,22 +34,11 @@
         width: calc(100% - 2px);
         height: calc(100vh - @left-panel-height-offset);
 
-        .left__tabs__summary,
         .left__tabs__arguments {
           width: 100%;
-        }
+          height: 100%;
 
-        .left__tabs__summary {
-          height: 50%;
-
-          .markdown-viewer {
-            max-height: 250px;
-          }
-        }
-
-        .left__tabs__arguments {
-          height: 50%;
-
+          .markdown-viewer,
           .ant-tabs-content {
             height: 100%;
           }
@@ -101,5 +90,11 @@
     right: 0;
     bottom: 0;
     left: 0;
+  }
+}
+
+.import-form-modal {
+  .ant-modal-body {
+    padding: 10px;
   }
 }

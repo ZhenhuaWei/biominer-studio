@@ -1,11 +1,4 @@
-export type LangItem = {
-  id: string;
-  defaultMessage: string;
-};
-
-export interface LangData {
-  [key: string]: LangItem;
-}
+import { LangData } from './data';
 
 export const langData: LangData = {
   reset: {
@@ -24,29 +17,13 @@ export const langData: LangData = {
     id: 'stat-engine.summary-operations.example-tooltip',
     defaultMessage: '加载示例数据',
   },
-  import: {
-    id: 'stat-engine.summary-operations.import',
-    defaultMessage: '导入',
-  },
-  importTooltip: {
-    id: 'stat-engine.summary-operations.import-tooltip',
-    defaultMessage: '导入参数文件',
-  },
-  export: {
-    id: 'stat-engine.summary-operations.export',
-    defaultMessage: '导出',
-  },
-  exportTooltip: {
-    id: 'stat-engine.summary-operations.export-tooltip',
-    defaultMessage: '导出参数',
-  },
   loadData: {
-    id: 'stat-engine.data-operations.load-data',
+    id: 'stat-engine.summary-operations.load-data',
     defaultMessage: '加载数据',
   },
   summary: {
     id: 'stat-engine.summary',
-    defaultMessage: '摘要',
+    defaultMessage: '文档',
   },
   arguments: {
     id: 'stat-engine.arguments',

@@ -59,11 +59,13 @@
     "lodash": "^4.17.11",
     "moment": "^2.25.3",
     "omit.js": "^2.0.2",
+    "papaparse": "^5.3.1",
     "plotly.js": "^2.2.1",
     "react": "^17.0.0",
     "react-chart-editor": "^0.45.0",
     "react-dev-inspector": "^1.1.1",
     "react-dom": "^17.0.0",
+    "react-draggable": "^4.4.3",
     "react-helmet-async": "^1.0.4",
     "react-lazylog": "^4.5.3",
     "react-markdown": "^6.0.2",
@@ -72,7 +74,8 @@
     "remark-gfm": "^1.0.0",
     "umi": "^3.5.0",
     "umi-plugin-setting-drawer": "^1.0.3",
-    "umi-serve": "^1.9.10"
+    "umi-serve": "^1.9.10",
+    "voca": "^1.4.0"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^2.0.2",

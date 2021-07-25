@@ -66,7 +66,7 @@ const ChartList: React.FC<ChartListProps> = (props) => {
           />
           {item.description}
           {item.tags.map((tag) => {
-            return <Tag>{tag}</Tag>;
+            return <Tag key={tag}>{tag}</Tag>;
           })}
         </List.Item>
       )}
