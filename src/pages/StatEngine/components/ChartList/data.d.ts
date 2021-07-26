@@ -5,6 +5,10 @@ export declare type DataItem = {
   state: string;
 };
 
+export declare type ReadOnlyData = {
+  [key: string]: any[][];
+};
+
 export declare type DataKey = {
   title: string;
   key: string;

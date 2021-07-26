@@ -16,7 +16,8 @@ import {
   IssuesCloseOutlined,
   FullscreenExitOutlined,
 } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { findIndex } from 'lodash';
 import './index.less';
 
 // Custom Component
@@ -32,20 +33,12 @@ import DataTable from './components/DataTable';
 // Custom DataType
 import { Bound } from './data';
 import { TableData } from './components/ImportForm/data';
-import { DataKey, ChartData, DataItem } from './components/ChartList/data';
-import { PlotlyChart } from './components/PlotlyViewer/data';
+import { DataKey, ChartData, DataItem, ReadOnlyData } from './components/ChartList/data';
 
 // Custom Data
 import { langData } from './lang';
 
-// API Endpoint
-import { getCharts, getPlotlyData } from '@/services/ant-design-pro/api';
-
 const logExample = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log';
-const dataTable = [
-  { a: 1, b: 2 },
-  { a: 2, b: 3 },
-];
 
 const { TabPane } = Tabs;
 
@@ -60,6 +53,7 @@ const StatEngine: React.FC = () => {
 
   // Chart
   // const [currentChart, setCurrentChart] = useState<ChartData | null>(null);
+  const [currentChart] = useState<ChartData | null>(null);
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
   const [dataKeys, setDataKeys] = useState<DataKey[]>([
@@ -74,12 +68,9 @@ const StatEngine: React.FC = () => {
       data: [],
     },
   ]);
-  const [plotlyData, setPlotlyData] = useState<PlotlyChart>({ data: [], layout: {} });
-  const [logLink, setLogLink] = useState<string>(logExample);
 
-  // Charts Drawer
-  const [charts, setCharts] = useState<ChartData[]>([]);
-  const [chartsTotal, setChartsTotal] = useState<number>(0);
+  const [tableData, setTableData] = useState<ReadOnlyData>({});
+  const [logLink, setLogLink] = useState<string>(logExample);
 
   // Modal
   const [modalDisabled, setModalDisabled] = useState<boolean>(false);
@@ -101,40 +92,40 @@ const StatEngine: React.FC = () => {
   };
 
   const onLoadData = (data: TableData) => {
-    console.log('onLoadData: ', data);
+    console.log('onLoadData: ', data, currentActiveKey);
+
+    const newData = {};
+    newData[currentActiveKey] = data;
+
+    setTableData({ ...tableData, ...newData });
     // Close the modal
     setModalVisible(false);
   };
 
   useEffect(() => {
-    getCharts({}).then((response) => {
-      setCharts(response.data);
-      setChartsTotal(response.total);
+    const data: ReadOnlyData = {};
+    dataKeys.forEach((item) => {
+      data[item.key] = [];
     });
-  }, []);
+    setTableData(data);
+  }, ['dataKeys']);
 
-  const selectItem = (chart: ChartData) => {
-    // setCurrentChart(chart);
-    // README
-    setMarkdownLink(chart.readme);
-    // Reset Argument
-    setArgumentColumns(chart.fields);
-    // Reset DataKey
-    setDataKeys(chart.dataKeys);
-    // Initialize Plotly
-    getPlotlyData('fig1', {}).then((response) => {
-      setPlotlyData({
-        ...plotlyData,
-        layout: response.layout,
-        data: response.data,
-      });
-    });
-    // Reset Log Container
-    setLogLink('');
-
-    // Close Charts Drawer
-    setChartsVisible(false);
-  };
+  const selectItem = useCallback(
+    (chart: ChartData) => {
+      // setCurrentChart(chart);
+      // README
+      setMarkdownLink(chart.readme);
+      // Reset Argument
+      setArgumentColumns(chart.fields);
+      // Reset DataKey
+      setDataKeys(chart.dataKeys);
+      // Reset Log Container
+      setLogLink('');
+      // Close Charts Drawer
+      setChartsVisible(false);
+    },
+    [currentChart],
+  );
 
   const isInDataContext = (key: string) => {
     console.log('isInDataContext: ', dataKeys, currentActiveKey);
@@ -192,6 +183,28 @@ const StatEngine: React.FC = () => {
         {uiContext.loadData}
       </Button>
     </Space>
+  );
+
+  const updateData = useCallback(
+    (key: string, data: any[][], header: string[]) => {
+      const idx = findIndex(dataKeys, (item) => {
+        return item.key === key;
+      });
+
+      console.log('Update Data: ', key, data, header, dataKeys, idx);
+
+      if (idx >= 0) {
+        const items = [...dataKeys];
+        const item = {
+          ...items[idx],
+          data: [header].concat(data),
+        };
+        items[idx] = item;
+
+        setDataKeys(items);
+      }
+    },
+    [tableData],
   );
 
   const resultOperations = (
@@ -259,7 +272,9 @@ const StatEngine: React.FC = () => {
                   return (
                     <TabPane tab={<span>{dataKey.title}</span>} key={dataKey.key}>
                       <DataTable
-                        data={dataTable}
+                        dataKey={dataKey.key}
+                        updateData={updateData}
+                        data={tableData[dataKey.key]}
                         height="calc(100vh - 145px)"
                         width="100%"
                       ></DataTable>
@@ -324,7 +339,7 @@ const StatEngine: React.FC = () => {
                         Exit Editor
                       </Button>
                     ) : null}
-                    <PlotlyViewer state={plotlyData} mode={plotlyEditorMode}></PlotlyViewer>
+                    <PlotlyViewer dataSource="fig1" mode={plotlyEditorMode}></PlotlyViewer>
                   </Col>
                 </TabPane>
                 <TabPane
@@ -357,7 +372,7 @@ const StatEngine: React.FC = () => {
         </Col>
       </Row>
       <Drawer
-        title={`Charts (${chartsTotal})`}
+        title="Chart Store"
         placement="right"
         closable
         width="50%"
@@ -366,7 +381,7 @@ const StatEngine: React.FC = () => {
         }}
         visible={chartsVisible}
       >
-        <ChartList onClickItem={selectItem} charts={charts} total={chartsTotal}></ChartList>
+        <ChartList onClickItem={selectItem}></ChartList>
       </Drawer>
       <Modal
         className="import-form-modal"

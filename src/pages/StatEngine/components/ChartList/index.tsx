@@ -1,17 +1,29 @@
-import React, { memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { List, Space, Tag } from 'antd';
 import { LikeOutlined, DislikeOutlined, FunctionOutlined } from '@ant-design/icons';
+
+// API Endpoint
+import { getCharts } from '@/services/ant-design-pro/api';
+
 import { ChartData } from './data';
 import './index.less';
 
 export type ChartListProps = {
-  charts: ChartData[];
-  total: number;
   onClickItem?: (chart: ChartData) => void;
 };
 
 const ChartList: React.FC<ChartListProps> = (props) => {
-  const { charts, total, onClickItem } = props;
+  const { onClickItem } = props;
+
+  const [charts, setCharts] = useState<ChartData[]>([]);
+  const [total, setTotal] = useState<number>(0);
+
+  useEffect(() => {
+    getCharts({}).then((response) => {
+      setCharts(response.data);
+      setTotal(response.total);
+    });
+  }, []);
 
   const IconText = ({ icon, text }) => (
     <Space>
@@ -20,9 +32,9 @@ const ChartList: React.FC<ChartListProps> = (props) => {
     </Space>
   );
 
-  // const showTotal = (num: number) => {
-  //   return `Total ${num} items`;
-  // };
+  const showTotal = (num: number) => {
+    return `Total ${num} items`;
+  };
 
   const titleLink = (title: string, version: string) => {
     return <a className="title">{`${title}- ${version}`}</a>;
@@ -41,6 +53,7 @@ const ChartList: React.FC<ChartListProps> = (props) => {
         },
         pageSize: 10,
         total,
+        showTotal,
         showSizeChanger: true,
         showQuickJumper: true,
       }}

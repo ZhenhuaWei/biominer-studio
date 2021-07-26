@@ -62,6 +62,8 @@ const ArgumentForm: React.FC<ArgumentProps> = (props) => {
     return span ? 24 - span : 20;
   };
 
+  console.log('ArgumentForm updated');
+
   return columns.length > 0 ? (
     <Row className="argument-form">
       <Col className="argument-form__header">

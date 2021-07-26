@@ -46,6 +46,8 @@ const ImportForm: React.FC<ImportFormProps> = (props) => {
       });
   };
 
+  console.log('ImportForm updated');
+
   return (
     <Row className="import-form">
       <Col className="control-panel">
