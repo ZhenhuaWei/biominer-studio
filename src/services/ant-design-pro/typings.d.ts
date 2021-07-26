@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { ChartData } from '../../pages/StatEngine/components/ChartList/data';
-import { PlotlyChart } from '../../pages/StatEngine/components/PlotlyViewer/data';
+import { PlotlyChart, DataResults } from '../../pages/StatEngine/components/PlotlyViewer/data';
 
 declare namespace API {
   type CurrentUser = {
@@ -65,6 +65,7 @@ declare namespace API {
   };
 
   type PlotlyChart = PlotlyChart;
+  type DataResults = DataResults;
 
   type FakeCaptcha = {
     code?: number;

@@ -3,15 +3,15 @@ import { Col, Row, Tabs, Button, Tooltip, message, Tag, Input } from 'antd';
 import { InfoCircleFilled } from '@ant-design/icons';
 import React, { useState } from 'react';
 
-import { TableData, PapaTableData } from './data';
-import { fetchData } from './service';
+import { DataLoader } from '../Common/data';
+
 import './index.less';
 
 const { TabPane } = Tabs;
 const { Search } = Input;
 
 export type ImportFormProps = {
-  onLoad: (data: TableData) => void;
+  onLoad: (loader: DataLoader) => void;
 };
 
 const example = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/iris.csv';
@@ -31,19 +31,12 @@ const ImportForm: React.FC<ImportFormProps> = (props) => {
   const onSearch = (externalURL: string) => {
     setLoadActive(true);
     console.log('onSearch: ', externalURL);
-    fetchData(externalURL)
-      .then((response) => {
-        console.log('getFile: ', response);
-        setLoadActive(false);
-        const papaTableData: PapaTableData = response;
-        onLoad(papaTableData.data);
-        message.success('Loaded Suessfully.');
-      })
-      .catch((error) => {
-        console.log('getFile Error: ', error);
-        setLoadActive(false);
-        message.error("Can't load the data, please check your url & try agian later.");
-      });
+    onLoad({
+      dataSource: externalURL,
+      dataSourceType: 'csvFile',
+      queryParams: {},
+      dataType: 'objectArray',
+    });
   };
 
   console.log('ImportForm updated');

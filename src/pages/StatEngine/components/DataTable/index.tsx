@@ -1,11 +1,12 @@
-import { memo } from 'react';
 import { getLocale } from 'umi';
-import React, { useState } from 'react';
+import React, { useState, useEffect, memo } from 'react';
+import { message } from 'antd';
 import { HotTable } from '@handsontable/react';
-import { map, isEqual } from 'lodash';
+import { map, merge } from 'lodash';
 
-import { TableData } from '../ImportForm/data';
-import { ColumnDefinition, ColumnSchema, ColumnType, DataType, Validator } from './data';
+import { TableData, PapaTableData, DataLoader } from '../Common/data';
+import { fetchData } from '../Common/service';
+import { ColumnDefinition, ColumnSchema, ColumnType, FieldType, Validator } from './data';
 
 import './index.less';
 import 'handsontable/dist/handsontable.full.min.css';
@@ -13,11 +14,11 @@ import 'handsontable/languages/zh-CN';
 
 export type DataTableProps = {
   dataKey: string;
-  data?: TableData;
+  dataLoader?: DataLoader;
   columns?: ColumnSchema[];
   height?: number | string;
   width?: number | string;
-  updateData?: (dataKey: string, data: any[][], headers: string[]) => void;
+  updateData: (dataKey: string, data: any[][], headers: string[]) => void;
 };
 
 const GenericValidator = (query: any, callback: any) => {
@@ -41,33 +42,7 @@ const genMinMaxValidator = (min: number, max: number) => {
   };
 };
 
-const getHeader = (data: TableData): string[] => {
-  if (data.length > 0) {
-    return Object.keys(data[0]);
-  }
-
-  return [];
-};
-
-const convertData = (data: TableData): any[][] | undefined => {
-  if (data.length > 0) {
-    const headers = getHeader(data);
-    const body = map(data, (item) => {
-      const record: any = [];
-      headers.forEach((field) => {
-        record.push(item[field]);
-      });
-
-      return record;
-    });
-
-    return body;
-  }
-
-  return undefined;
-};
-
-const convertType = (dataType: DataType): ColumnType => {
+const convertType = (dataType: FieldType): ColumnType => {
   if (['float', 'int', 'double'].includes(dataType)) {
     return 'numeric';
   }
@@ -109,14 +84,40 @@ const makeColumns = (columns: ColumnSchema[] | undefined): ColumnDefinition[] | 
   return undefined;
 };
 
+const getHeader = (data: TableData): string[] => {
+  if (data.length > 0) {
+    return Object.keys(data[0]);
+  }
+
+  return [];
+};
+
+const convertData = (data: TableData): any[][] | undefined => {
+  if (data.length > 0) {
+    const headers = getHeader(data);
+    const body = map(data, (item) => {
+      const record: any = [];
+      headers.forEach((field) => {
+        record.push(item[field]);
+      });
+
+      return record;
+    });
+
+    return body;
+  }
+
+  return undefined;
+};
+
 const tableSettings = {
   bindRowsWithHeaders: true,
   colHeaders: true,
   rowHeaders: true,
   filters: true,
   className: 'htCenter',
-  minSpareRows: 30,
-  minSpareCols: 10,
+  minRows: 30,
+  minCols: 5,
   data: null,
   manualColumnFreeze: true,
   dropdownMenu: [
@@ -163,18 +164,50 @@ const tableSettings = {
 };
 
 const DataTable: React.FC<DataTableProps> = (props) => {
-  const { dataKey, data, height, width, columns, updateData } = props;
+  const { dataKey, dataLoader, height, width, columns, updateData } = props;
 
-  // const [tableData, setTableData] = useState<any[][] | undefined>(undefined);
-  // const [tableHeader, setTableHeader] = useState<string[]>([]);
+  const [tableData, setTableData] = useState<any[][] | undefined>(undefined);
+  const [tableHeader, setTableHeader] = useState<string[]>([]);
   const [ref, setRef] = useState<HotTable>();
 
-  // useEffect(() => {
-  //   setTableHeader(getHeader(data || []));
-  //   setTableData(convertData(data || []));
-  // }, ['data']);
+  const onUpdateData = (
+    key: string,
+    callback: typeof updateData,
+    sourceHeader: string[] | undefined,
+    sourceData: any[][] | undefined,
+  ) => {
+    console.log('onUpdateData: ', {
+      sourceData,
+      sourceHeader,
+      hotTableData: ref?.hotInstance.getData(),
+      hotTableHeader: ref?.hotInstance.getColHeader(),
+    });
+    const hotTableData =
+      sourceData && sourceData.length > 0 ? sourceData : ref?.hotInstance.getData();
+    const hotTableHeader =
+      sourceHeader && sourceHeader.length > 0 ? sourceHeader : ref?.hotInstance.getColHeader();
+    // @ts-ignore
+    callback(key, hotTableData || [], hotTableHeader || []);
+  };
 
-  console.log('DataTable: ', data, makeColumns(columns));
+  useEffect(() => {
+    if (dataLoader && dataLoader.dataSourceType === 'csvFile') {
+      fetchData(dataLoader.dataSource)
+        .then((response) => {
+          console.log('getFile: ', response);
+          const papaTableData: PapaTableData = response;
+          setTableData(convertData(papaTableData.data));
+          setTableHeader(getHeader(papaTableData.data));
+          message.success('Loaded Suessfully.');
+        })
+        .catch((error) => {
+          console.log('getFile Error: ', error);
+          message.error("Can't load the data, please check your url & try agian later.");
+        });
+    }
+  }, [dataLoader]);
+
+  console.log('DataTable: ', { dataLoader, columns: makeColumns(columns), tableData, tableHeader });
 
   return (
     <HotTable
@@ -183,22 +216,22 @@ const DataTable: React.FC<DataTableProps> = (props) => {
       }}
       language={getLocale()}
       className="data-table"
-      data={convertData(data || [])}
+      data={tableData}
       settings={tableSettings}
-      colHeaders={getHeader(data || []) || true}
+      colHeaders={tableHeader}
       rowHeaders={true}
       height={height}
       width={width}
       columns={makeColumns(columns)}
       afterChange={(changes) => {
-        console.log('HotTable: ', changes, ref?.hotInstance.getData());
-        if (updateData && ref?.hotInstance.getData()) {
-          updateData(dataKey, ref?.hotInstance.getData(), getHeader(data || []));
-        }
+        onUpdateData(dataKey, updateData, tableHeader, ref?.hotInstance.getData());
+      }}
+      afterLoadData={(sourceData) => {
+        onUpdateData(dataKey, updateData, tableHeader, sourceData);
       }}
       licenseKey="non-commercial-and-evaluation"
     />
   );
 };
 
-export default memo(DataTable, isEqual);
+export default memo(DataTable);

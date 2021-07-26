@@ -52,3 +52,7 @@ export declare type PlotlyChart = {
   layout: Layout;
   frames?: Frames;
 };
+
+export declare type DataResults = {
+  [key: string]: any[];
+};

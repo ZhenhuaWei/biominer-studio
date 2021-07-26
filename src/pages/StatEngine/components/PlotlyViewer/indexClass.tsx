@@ -6,12 +6,14 @@ import PlotlyEditor from 'react-chart-editor';
 
 import * as localeDictionary from 'plotly.js/lib/locales/zh-cn';
 import { PlotlyEditorState, Data, Layout, Frames } from './data';
+import { getPlotlyData, getDataResults } from '@/services/ant-design-pro/api';
 
 import 'react-chart-editor/lib/react-chart-editor.css';
 import './index.less';
 
 export interface ChartEditorProps {
-  state?: PlotlyEditorState;
+  dataLink: string;
+  plotlyLink: string;
   handleUpdate?: (state: PlotlyEditorState) => void;
   mode?: string;
 }
@@ -20,28 +22,42 @@ export interface ChartEditorState {
   data: Data;
   layout: Layout;
   frames: Frames;
+  dataSources: object;
+  dataSourceOptions: object[];
 }
 
-export default class ChartEditor extends React.Component<ChartEditorProps, ChartEditorState> {
+export default class ChartEditor extends React.PureComponent<ChartEditorProps, ChartEditorState> {
   constructor(props: ChartEditorProps) {
     super(props);
     const initialState: ChartEditorState = {
-      data: props.state ? props.state.data || [] : [],
-      layout: props.state ? props.state.layout || {} : {},
-      frames: props.state ? props.state.frames || [] : [],
+      data: [],
+      layout: {},
+      frames: [],
+      dataSources: {},
+      dataSourceOptions: [],
     };
     // TODO: Remove after upgrading to React 16.3
     this.state = initialState;
   }
 
-  static getDerivedStateFromProps(nextProps: ChartEditorProps, prevState?: ChartEditorState) {
-    // return prevState;
-    console.log('PlotlyViewer: ', nextProps, prevState);
-    return {
-      data: nextProps.state?.data,
-      layout: nextProps.state?.layout,
-      frames: nextProps.state?.frames,
-    };
+  componentWillMount() {
+    getPlotlyData('fig1', {}).then((response) => {
+      this.setState({
+        data: response.data,
+        layout: response.layout,
+        frames: response.frames,
+      });
+    });
+
+    getDataResults('fig1', {}).then((response) => {
+      this.setState({
+        dataSources: response,
+        dataSourceOptions: Object.keys(response).map((name) => ({
+          value: name,
+          label: name,
+        })),
+      });
+    });
   }
 
   handleUpdate = (data: Data, layout: Layout, frames: Frames) => {
@@ -67,7 +83,7 @@ export default class ChartEditor extends React.Component<ChartEditorProps, Chart
   };
 
   render() {
-    const { data, layout, frames } = this.state;
+    const { data, layout, frames, dataSources, dataSourceOptions } = this.state;
     const config = {
       toImageButtonOptions: {
         format: 'svg', // one of png, svg, jpeg, webp
@@ -92,7 +108,7 @@ export default class ChartEditor extends React.Component<ChartEditorProps, Chart
     // mode: ["Plotly", "PlotlyEditor"]
     return this.props.mode === 'Plotly' ? (
       <PlotlyChart
-        ref={(plotlyRef) => {
+        ref={(plotlyRef: PlotlyEditor) => {
           this.ref = plotlyRef;
         }}
         useResizeHandler
@@ -112,6 +128,8 @@ export default class ChartEditor extends React.Component<ChartEditorProps, Chart
           config={config}
           frames={frames}
           plotly={plotly}
+          dataSources={dataSources}
+          dataSourceOptions={dataSourceOptions}
           onUpdate={this.handleUpdate}
           onRender={this.handleRender}
           useResizeHandler

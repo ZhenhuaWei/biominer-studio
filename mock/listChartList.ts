@@ -40,18 +40,10 @@ const genList = (current: number, pageSize: number) => {
         },
         { title: '创建时间', dataIndex: 'created_at', valueType: 'dateRange' },
       ],
-      dataKeys: [
-        {
-          title: 'Data',
-          key: 'data',
-          data: [],
-        },
-        {
-          title: 'Sample Data',
-          key: 'sample-data',
-          data: [],
-        },
-      ],
+      dataKey: {
+        annoData: 'Anno Data',
+        data: 'Data',
+      },
       examples: [
         {
           title: '',

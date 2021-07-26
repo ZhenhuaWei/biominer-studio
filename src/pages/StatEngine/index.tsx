@@ -17,7 +17,6 @@ import {
   FullscreenExitOutlined,
 } from '@ant-design/icons';
 import React, { useState, useEffect, useCallback } from 'react';
-import { findIndex } from 'lodash';
 import './index.less';
 
 // Custom Component
@@ -25,15 +24,15 @@ import MarkdownViewer from './components/MarkdownViewer';
 import LogViewer from './components/LogViewer';
 import Resizer from './components/Resizer';
 import ArgumentForm from './components/ArgumentForm';
-import PlotlyViewer from './components/PlotlyViewer';
+import PlotlyViewer from './components/PlotlyViewer/indexClass';
 import ChartList from './components/ChartList';
 import ImportForm from './components/ImportForm';
 import DataTable from './components/DataTable';
 
 // Custom DataType
 import { Bound } from './data';
-import { TableData } from './components/ImportForm/data';
-import { DataKey, ChartData, DataItem, ReadOnlyData } from './components/ChartList/data';
+import { DataLoader } from './components/Common/data';
+import { DataKey, ChartData, DataItem } from './components/ChartList/data';
 
 // Custom Data
 import { langData } from './lang';
@@ -56,20 +55,16 @@ const StatEngine: React.FC = () => {
   const [currentChart] = useState<ChartData | null>(null);
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
-  const [dataKeys, setDataKeys] = useState<DataKey[]>([
-    {
-      title: 'Data',
-      key: 'data',
-      data: [],
-    },
-    {
-      title: 'Sample Data',
-      key: 'sample-data',
-      data: [],
-    },
-  ]);
+  const [dataKey, setDataKey] = useState<DataKey>({
+    annoData: 'Anno Data',
+    data: 'Data',
+  });
 
-  const [tableData, setTableData] = useState<ReadOnlyData>({});
+  // Data & Anno Data
+  const [data, setData] = useState<any[][]>([]);
+  const [annoData, setAnnoData] = useState<any[][]>([]);
+  const [dataLoader, setDataLoader] = useState<{ [key: string]: DataLoader }>({});
+
   const [logLink, setLogLink] = useState<string>(logExample);
 
   // Modal
@@ -91,24 +86,13 @@ const StatEngine: React.FC = () => {
     }
   };
 
-  const onLoadData = (data: TableData) => {
-    console.log('onLoadData: ', data, currentActiveKey);
-
-    const newData = {};
-    newData[currentActiveKey] = data;
-
-    setTableData({ ...tableData, ...newData });
+  const onLoadData = (loader: DataLoader) => {
+    const currentDataLoader = {};
+    currentDataLoader[currentActiveKey] = { ...dataLoader[currentActiveKey], ...loader };
+    setDataLoader({ ...dataLoader, ...currentDataLoader });
     // Close the modal
     setModalVisible(false);
   };
-
-  useEffect(() => {
-    const data: ReadOnlyData = {};
-    dataKeys.forEach((item) => {
-      data[item.key] = [];
-    });
-    setTableData(data);
-  }, ['dataKeys']);
 
   const selectItem = useCallback(
     (chart: ChartData) => {
@@ -118,7 +102,7 @@ const StatEngine: React.FC = () => {
       // Reset Argument
       setArgumentColumns(chart.fields);
       // Reset DataKey
-      setDataKeys(chart.dataKeys);
+      setDataKey(chart.dataKey);
       // Reset Log Container
       setLogLink('');
       // Close Charts Drawer
@@ -128,19 +112,7 @@ const StatEngine: React.FC = () => {
   );
 
   const isInDataContext = (key: string) => {
-    console.log('isInDataContext: ', dataKeys, currentActiveKey);
-
-    if (dataKeys) {
-      const allKeys = dataKeys.map((item) => {
-        return item.key;
-      });
-
-      console.log('allKeys: ', allKeys, dataKeys, currentActiveKey, key);
-
-      return allKeys.includes(key) || false;
-    }
-
-    return false;
+    return ['data', 'annoData'].includes(key) || false;
   };
 
   const changeDataTab = (key: string) => {
@@ -186,25 +158,16 @@ const StatEngine: React.FC = () => {
   );
 
   const updateData = useCallback(
-    (key: string, data: any[][], header: string[]) => {
-      const idx = findIndex(dataKeys, (item) => {
-        return item.key === key;
-      });
+    (key: string, tableData: any[][], tableHeader: string[]) => {
+      if (key === 'data') {
+        setData([tableHeader].concat(tableData));
+      }
 
-      console.log('Update Data: ', key, data, header, dataKeys, idx);
-
-      if (idx >= 0) {
-        const items = [...dataKeys];
-        const item = {
-          ...items[idx],
-          data: [header].concat(data),
-        };
-        items[idx] = item;
-
-        setDataKeys(items);
+      if (key === 'annoData') {
+        setAnnoData([tableHeader].concat(tableData));
       }
     },
-    [tableData],
+    [dataLoader],
   );
 
   const resultOperations = (
@@ -268,19 +231,26 @@ const StatEngine: React.FC = () => {
                 >
                   <MarkdownViewer url={markdownLink} />
                 </TabPane>
-                {dataKeys.map((dataKey) => {
-                  return (
-                    <TabPane tab={<span>{dataKey.title}</span>} key={dataKey.key}>
-                      <DataTable
-                        dataKey={dataKey.key}
-                        updateData={updateData}
-                        data={tableData[dataKey.key]}
-                        height="calc(100vh - 145px)"
-                        width="100%"
-                      ></DataTable>
-                    </TabPane>
-                  );
-                })}
+                <TabPane tab={<span>Data</span>} key="data">
+                  <DataTable
+                    dataKey="data"
+                    updateData={updateData}
+                    dataLoader={dataLoader['data']}
+                    height="calc(100vh - 145px)"
+                    width="100%"
+                  ></DataTable>
+                </TabPane>
+                {dataKey['annoData'] ? (
+                  <TabPane tab={<span>Anno Data</span>} key="annoData">
+                    <DataTable
+                      dataKey="annoData"
+                      updateData={updateData}
+                      dataLoader={dataLoader['annoData']}
+                      height="calc(100vh - 145px)"
+                      width="100%"
+                    ></DataTable>
+                  </TabPane>
+                ) : null}
                 <TabPane tab={<span>{uiContext.arguments}</span>} key="arguments">
                   <ArgumentForm
                     layout="vertical"
@@ -339,7 +309,11 @@ const StatEngine: React.FC = () => {
                         Exit Editor
                       </Button>
                     ) : null}
-                    <PlotlyViewer dataSource="fig1" mode={plotlyEditorMode}></PlotlyViewer>
+                    <PlotlyViewer
+                      dataLink="fig1"
+                      plotlyLink="fig1"
+                      mode={plotlyEditorMode}
+                    ></PlotlyViewer>
                   </Col>
                 </TabPane>
                 <TabPane
@@ -424,11 +398,7 @@ const StatEngine: React.FC = () => {
           </Draggable>
         )}
       >
-        <ImportForm
-          onLoad={(data: TableData) => {
-            onLoadData(data);
-          }}
-        ></ImportForm>
+        <ImportForm onLoad={onLoadData}></ImportForm>
       </Modal>
     </GridContent>
   );

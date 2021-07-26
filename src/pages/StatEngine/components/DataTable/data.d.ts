@@ -2,7 +2,7 @@ import Handsontable from 'handsontable';
 
 export declare type ColumnType = 'date' | 'numeric' | 'text' | 'dropdown';
 
-export declare type DataType = 'float' | 'int' | 'double' | 'boolean' | 'string';
+export declare type FieldType = 'float' | 'int' | 'double' | 'boolean' | 'string';
 
 export declare type Validator = (
   query,
@@ -23,7 +23,7 @@ export declare type ColumnDefinition = {
 
 export declare type ColumnSchema = {
   name: string;
-  type: DataType;
+  type: FieldType;
   choices?: string[];
   min?: number;
   max?: number;

@@ -40,9 +40,20 @@ export async function getNotices(options?: { [key: string]: any }) {
   });
 }
 
-/** 获取Plotly Data for Chart GET /api/chart */
+/** 获取Plotly Data for Chart GET /api/figure */
 export async function getPlotlyData(id: string, params: {}, options?: { [key: string]: any }) {
   return request<API.PlotlyChart>(`/api/figure/${id}`, {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 获取Plotly Raw Data for Chart GET /api/data */
+export async function getDataResults(id: string, params: {}, options?: { [key: string]: any }) {
+  return request<API.DataResults>(`/api/data/${id}`, {
     method: 'GET',
     params: {
       ...params,

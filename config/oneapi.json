@@ -494,20 +494,6 @@
           }
         }
       },
-      "DataKeyItem": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "data": {
-            "type": "array"
-          }
-        }
-      },
       "ExampleItem": {
         "type": "object",
         "properties": {
@@ -562,16 +548,21 @@
               "$ref": "#/components/schemas/FieldItem"
             }
           },
-          "dataKeys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DataKeyItem"
+          "dataKey": {
+            "type": "object",
+            "properties": {
+              "annoData": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              }
             }
           },
           "examples": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DataKeyItem"
+              "$ref": "#/components/schemas/ExampleItem"
             }
           }
         }

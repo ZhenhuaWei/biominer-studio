@@ -10,9 +10,8 @@ export declare type ReadOnlyData = {
 };
 
 export declare type DataKey = {
-  title: string;
-  key: string;
-  data: Object[];
+  annoData?: string;
+  data: string;
 };
 
 export declare type Example = {
@@ -34,6 +33,6 @@ export declare type ChartData = {
   readme: string;
   tags: string[];
   fields: ProFormColumnsType<DataItem>[];
-  dataKeys: DataKey[];
+  dataKey: DataKey;
   examples: Example[];
 };

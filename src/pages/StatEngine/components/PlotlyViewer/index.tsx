@@ -47,9 +47,9 @@ const PlotlyViewer: React.FC<PlotlyViewerProps> = (props) => {
     }
   }, [dataSource]);
 
-  const handleResize = () => {
-    if (ref.state.graphDiv instanceof HTMLElement) plotly.Plots.resize(ref.state.graphDiv);
-  };
+  // const handleResize = () => {
+  //   if (ref.state.graphDiv instanceof HTMLElement) plotly.Plots.resize(ref.state.graphDiv);
+  // };
 
   const config = {
     toImageButtonOptions: {
