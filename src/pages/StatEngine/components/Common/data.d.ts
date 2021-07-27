@@ -20,3 +20,12 @@ export declare type DataLoader = {
   dataType: DataType;
   queryParams: QueryParams;
 };
+
+export declare type LangItem = {
+  id: string;
+  defaultMessage: string;
+};
+
+export declare interface LangData {
+  [key: string]: LangItem;
+}

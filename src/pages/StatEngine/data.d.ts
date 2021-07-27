@@ -4,12 +4,3 @@ export declare type Bound = {
   bottom: number;
   left: number;
 };
-
-export declare type LangItem = {
-  id: string;
-  defaultMessage: string;
-};
-
-export declare interface LangData {
-  [key: string]: LangItem;
-}

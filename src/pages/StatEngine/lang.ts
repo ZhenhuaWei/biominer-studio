@@ -1,4 +1,4 @@
-import { LangData } from './data';
+import { LangData } from './components/Common/data';
 
 export const langData: LangData = {
   reset: {

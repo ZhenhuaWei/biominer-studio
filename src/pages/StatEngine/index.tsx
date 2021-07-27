@@ -1,33 +1,26 @@
 import { useIntl } from 'umi';
 import { GridContent } from '@ant-design/pro-layout';
-import { Col, Row, Tabs, Space, Button, Tooltip, Drawer, Modal } from 'antd';
+import { Col, Row, Tabs, Space, Button, Tooltip, Modal } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-form';
 import Draggable from 'react-draggable';
+import { reactLocalStorage } from 'reactjs-localstorage';
 
 import {
-  EditOutlined,
   InfoCircleOutlined,
   StopOutlined,
   DatabaseOutlined,
-  BarChartOutlined,
   ContainerOutlined,
-  SnippetsOutlined,
-  HistoryOutlined,
-  IssuesCloseOutlined,
-  FullscreenExitOutlined,
 } from '@ant-design/icons';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './index.less';
 
 // Custom Component
 import MarkdownViewer from './components/MarkdownViewer';
-import LogViewer from './components/LogViewer';
 import Resizer from './components/Resizer';
 import ArgumentForm from './components/ArgumentForm';
-import PlotlyViewer from './components/PlotlyViewer/indexClass';
-import ChartList from './components/ChartList';
 import ImportForm from './components/ImportForm';
 import DataTable from './components/DataTable';
+import ResultPanel from './components/ResultPanel';
 
 // Custom DataType
 import { Bound } from './data';
@@ -43,16 +36,14 @@ const { TabPane } = Tabs;
 
 const StatEngine: React.FC = () => {
   const [leftSpan, setLeftSpan] = useState<number>(12);
-  const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
-  const [chartsVisible, setChartsVisible] = useState<boolean>(false);
   const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
-  const [currentActiveKey, setCurrentActiveKey] = useState<string>('summary');
 
+  // Left Panel
+  const [currentActiveKey, setCurrentActiveKey] = useState<string>('summary');
   const [inDataContext, setInDataContext] = useState<boolean>(false);
 
   // Chart
-  // const [currentChart, setCurrentChart] = useState<ChartData | null>(null);
-  const [currentChart] = useState<ChartData | null>(null);
+  const [currentChart, setCurrentChart] = useState<ChartData | null>(null);
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
   const [dataKey, setDataKey] = useState<DataKey>({
@@ -64,7 +55,12 @@ const StatEngine: React.FC = () => {
   const [data, setData] = useState<any[][]>([]);
   const [annoData, setAnnoData] = useState<any[][]>([]);
   const [dataLoader, setDataLoader] = useState<{ [key: string]: DataLoader }>({});
+  const [resultData, setResultData] = useState<{ resultId: string; plotlyId: string }>({
+    resultId: '',
+    plotlyId: '',
+  });
 
+  // Right Panel
   const [logLink, setLogLink] = useState<string>(logExample);
 
   // Modal
@@ -105,8 +101,9 @@ const StatEngine: React.FC = () => {
       setDataKey(chart.dataKey);
       // Reset Log Container
       setLogLink('');
-      // Close Charts Drawer
-      setChartsVisible(false);
+
+      // Save currentChart into localStorage
+      reactLocalStorage.setObject('BIO_MINER_CURRENT_CHART', chart);
     },
     [currentChart],
   );
@@ -170,40 +167,18 @@ const StatEngine: React.FC = () => {
     [dataLoader],
   );
 
-  const resultOperations = (
-    <Space>
-      <Tooltip title="Edit the Chart">
-        <Button
-          type="primary"
-          icon={<EditOutlined />}
-          onClick={() => {
-            setPlotlyEditorMode('PlotlyEditor');
-          }}
-        >
-          {uiContext.edit}
-        </Button>
-      </Tooltip>
-      <Tooltip title="List all charts">
-        <Button
-          onClick={() => {
-            setChartsVisible(true);
-          }}
-          icon={<BarChartOutlined />}
-        >
-          {uiContext.charts}
-        </Button>
-      </Tooltip>
-      <Tooltip title="List all history">
-        <Button disabled icon={<HistoryOutlined />}>
-          {uiContext.history}
-        </Button>
-      </Tooltip>
-    </Space>
-  );
-
   const getRightSpan = function (customLeftSpan: number): number {
     return 24 - customLeftSpan ? 24 - customLeftSpan : 24;
   };
+
+  useEffect(() => {
+    // Restore data from localStorage
+    const chart = reactLocalStorage.getObject('BIO_MINER_CURRENT_CHART');
+    if (Object.entries(chart).length > 0) {
+      setCurrentChart(chart);
+      selectItem(chart);
+    }
+  }, []);
 
   return (
     <GridContent>
@@ -278,85 +253,16 @@ const StatEngine: React.FC = () => {
           xs={24}
         >
           <Row className="right__content">
-            <Col className="right__tabs">
-              <Tabs
-                defaultActiveKey="1"
-                className="right__tabs-result"
-                tabBarExtraContent={resultOperations}
-              >
-                <TabPane
-                  tab={
-                    <span>
-                      <BarChartOutlined />
-                      {uiContext.figure}
-                    </span>
-                  }
-                  key="1"
-                >
-                  <Col
-                    id="graph-container"
-                    className={`result-container
-                      ${plotlyEditorMode === 'PlotlyEditor' ? 'full-screen' : 'no-full-screen'}`}
-                  >
-                    {plotlyEditorMode === 'PlotlyEditor' ? (
-                      <Button
-                        className="exit-editor"
-                        onClick={() => {
-                          setPlotlyEditorMode('Plotly');
-                        }}
-                      >
-                        <FullscreenExitOutlined />
-                        Exit Editor
-                      </Button>
-                    ) : null}
-                    <PlotlyViewer
-                      dataLink="fig1"
-                      plotlyLink="fig1"
-                      mode={plotlyEditorMode}
-                    ></PlotlyViewer>
-                  </Col>
-                </TabPane>
-                <TabPane
-                  tab={
-                    <span>
-                      <SnippetsOutlined />
-                      {uiContext.results}
-                    </span>
-                  }
-                  key="2"
-                >
-                  <Col id="result-container" className="result-container">
-                    Comming Soon...
-                  </Col>
-                </TabPane>
-                <TabPane
-                  tab={
-                    <span>
-                      <IssuesCloseOutlined />
-                      {uiContext.log}
-                    </span>
-                  }
-                  key="3"
-                >
-                  <LogViewer height="530" url={logLink} />
-                </TabPane>
-              </Tabs>
-            </Col>
+            <ResultPanel
+              resultId={resultData.resultId}
+              plotlyId={resultData.plotlyId}
+              responsiveKey={leftSpan}
+              logLink={logLink}
+              onClickItem={selectItem}
+            ></ResultPanel>
           </Row>
         </Col>
       </Row>
-      <Drawer
-        title="Chart Store"
-        placement="right"
-        closable
-        width="50%"
-        onClose={() => {
-          setChartsVisible(false);
-        }}
-        visible={chartsVisible}
-      >
-        <ChartList onClickItem={selectItem}></ChartList>
-      </Drawer>
       <Modal
         className="import-form-modal"
         width="50%"
