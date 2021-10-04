@@ -39,7 +39,8 @@ const PlotlyViewer: React.FC<PlotlyViewerProps> = (props) => {
 
   useEffect(() => {
     if (dataSource) {
-      getPlotlyData('fig1', {}).then((response) => {
+      // Need to set autorange to true
+      getPlotlyData('fig4', {}).then((response) => {
         setData(response.data);
         setLayout(response.layout);
         setFrames(response.frames);

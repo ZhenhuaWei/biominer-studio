@@ -15,20 +15,22 @@ import './index.less';
 import { DataItem } from './data';
 import { langData } from './lang';
 
-export type FormType = Parameters<typeof ProForm>[0]['layout'];
-
 export type ArgumentProps = {
   columns: ProFormColumnsType<DataItem>[];
   height?: string;
   labelSpan?: number;
-  layout?: FormType;
 };
 
 const ArgumentForm: React.FC<ArgumentProps> = (props) => {
-  const { columns, height, labelSpan, layout } = props;
+  const { columns, height, labelSpan } = props;
 
   const activateBtn = (
-    <FormItem label="Editor" labelCol={{ span: labelSpan }}>
+    <FormItem
+      label="Editor"
+      style={{ width: '50%' }}
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+    >
       <Button style={{ width: '100%' }}>
         <EditOutlined />
         Edit
@@ -36,7 +38,7 @@ const ArgumentForm: React.FC<ArgumentProps> = (props) => {
     </FormItem>
   );
 
-  const [layoutType, setLayoutType] = useState<ProFormLayoutType>('Form');
+  const [layoutType, setLayoutType] = useState<ProFormLayoutType>('QueryFilter');
 
   const intl = useIntl();
   interface UIContext {
@@ -48,30 +50,16 @@ const ArgumentForm: React.FC<ArgumentProps> = (props) => {
     uiContext[key] = intl.formatMessage(langData[key]);
   });
 
-  const getLabelSpan = (span: number | undefined): number => {
-    if (layout && layout === 'vertical') {
-      return 24;
-    }
-    return span || 4;
-  };
-
-  const getWrapperSpan = (span: number | undefined): number => {
-    if (layout && layout === 'vertical') {
-      return 24;
-    }
-    return span ? 24 - span : 20;
-  };
-
   console.log('ArgumentForm updated');
 
   return columns.length > 0 ? (
     <Row className="argument-form">
       <Col className="argument-form__header">
         <ProFormSelect
-          label="布局方式"
+          label="Layout"
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
-          options={['ProForm', 'ModalForm', 'DrawerForm', 'LightFilter', 'QueryFilter']}
+          options={['ModalForm', 'QueryFilter']}
           fieldProps={{
             value: layoutType,
             onChange: (e) => setLayoutType(e),
@@ -91,13 +79,13 @@ const ArgumentForm: React.FC<ArgumentProps> = (props) => {
         </Space>
       </Col>
       <BetaSchemaForm<DataItem>
-        className={`schema-form ${layout || 'vertical'}`}
+        className="schema-form vertical"
         trigger={activateBtn}
         style={{ height }}
+        span={labelSpan}
+        defaultCollapsed={false}
         layoutType={layoutType}
-        labelCol={{ span: getLabelSpan(labelSpan) }}
-        wrapperCol={{ span: getWrapperSpan(labelSpan) }}
-        layout={layout || 'vertical'}
+        layout="vertical"
         onFinish={async (values) => {
           console.log(values);
         }}

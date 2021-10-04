@@ -62,6 +62,15 @@ export async function getDataResults(id: string, params: {}, options?: { [key: s
   });
 }
 
+/** 获取Chart Schema GET /api/chart/<plugin_name> */
+export async function getChartSchema(chartName: string, options?: { [key: string]: any }) {
+  return request<API.ChartSchema>('/api/chart/' + chartName, {
+    method: 'GET',
+    params: {},
+    ...(options || {}),
+  });
+}
+
 /** 获取Chart列表 GET /api/charts */
 export async function getCharts(
   params: {

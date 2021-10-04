@@ -25,10 +25,16 @@ import ResultPanel from './components/ResultPanel';
 // Custom DataType
 import { Bound } from './data';
 import { DataLoader } from './components/Common/data';
-import { DataKey, ChartData, DataItem } from './components/ChartList/data';
+import { DataKey, ChartMetaData, DataItem } from './components/ChartList/data';
+
+// Custom API
+import { getChartSchema } from '@/services/ant-design-pro/api';
 
 // Custom Data
 import { langData } from './lang';
+
+// Custom Helper
+import { render as renderTemplate } from './util';
 
 const logExample = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log';
 
@@ -43,11 +49,11 @@ const StatEngine: React.FC = () => {
   const [inDataContext, setInDataContext] = useState<boolean>(false);
 
   // Chart
-  const [currentChart, setCurrentChart] = useState<ChartData | null>(null);
+  const [currentChart, setCurrentChart] = useState<ChartMetaData | null>(null);
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
   const [dataKey, setDataKey] = useState<DataKey>({
-    annoData: 'Anno Data',
+    annoData: 'Anno',
     data: 'Data',
   });
 
@@ -57,8 +63,10 @@ const StatEngine: React.FC = () => {
   const [dataLoader, setDataLoader] = useState<{ [key: string]: DataLoader }>({});
   const [resultData, setResultData] = useState<{ resultId: string; plotlyId: string }>({
     resultId: '',
-    plotlyId: '',
+    plotlyId: 'fig4',
   });
+  // Must be a json string
+  const [argumentFields, setArgumentFields] = useState<string>('{}');
 
   // Right Panel
   const [logLink, setLogLink] = useState<string>(logExample);
@@ -91,19 +99,32 @@ const StatEngine: React.FC = () => {
   };
 
   const selectItem = useCallback(
-    (chart: ChartData) => {
-      // setCurrentChart(chart);
-      // README
-      setMarkdownLink(chart.readme);
-      // Reset Argument
-      setArgumentColumns(chart.fields);
-      // Reset DataKey
-      setDataKey(chart.dataKey);
-      // Reset Log Container
-      setLogLink('');
+    (chart: ChartMetaData) => {
+      getChartSchema(chart.shortName).then((response) => {
+        const schema = {
+          ...response.schema,
+        };
 
-      // Save currentChart into localStorage
-      reactLocalStorage.setObject('BIO_MINER_CURRENT_CHART', chart);
+        // setCurrentChart(chart);
+        // README
+        setMarkdownLink(chart.readme);
+        // Reset Argument
+        const fieldsString = JSON.stringify(schema.fields);
+        setArgumentFields(fieldsString);
+        const fields = renderTemplate(fieldsString, {
+          columns: [],
+          datafile: [],
+        });
+        console.log('Fields: ', fields);
+        setArgumentColumns(fields);
+        // Reset DataKey
+        setDataKey(schema.dataKey);
+        // Reset Log Container
+        setLogLink('');
+
+        // Save currentChart into localStorage
+        reactLocalStorage.setObject('BIO_MINER_CURRENT_CHART', chart);
+      });
     },
     [currentChart],
   );
@@ -156,8 +177,23 @@ const StatEngine: React.FC = () => {
 
   const updateData = useCallback(
     (key: string, tableData: any[][], tableHeader: string[]) => {
+      console.log('Table Header: ', tableHeader);
       if (key === 'data') {
         setData([tableHeader].concat(tableData));
+
+        // Initial Arguments
+        if (
+          tableHeader.length > 0 &&
+          dataLoader['data'].dataSource &&
+          dataLoader['data'].dataSource.length > 0
+        ) {
+          const fields = renderTemplate(argumentFields, {
+            columns: tableHeader,
+            datafile: [dataLoader['data'].dataSource],
+          });
+          console.log('Updated Fields: ', fields);
+          setArgumentColumns(fields);
+        }
       }
 
       if (key === 'annoData') {
@@ -216,7 +252,7 @@ const StatEngine: React.FC = () => {
                   ></DataTable>
                 </TabPane>
                 {dataKey['annoData'] ? (
-                  <TabPane tab={<span>Anno Data</span>} key="annoData">
+                  <TabPane tab={<span>Anno</span>} key="annoData">
                     <DataTable
                       dataKey="annoData"
                       updateData={updateData}
@@ -228,7 +264,7 @@ const StatEngine: React.FC = () => {
                 ) : null}
                 <TabPane tab={<span>{uiContext.arguments}</span>} key="arguments">
                   <ArgumentForm
-                    layout="vertical"
+                    labelSpan={12}
                     height="calc(100% - 62px)"
                     columns={argumentColumns}
                   ></ArgumentForm>

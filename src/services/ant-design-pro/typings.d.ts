@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import { ChartData } from '../../pages/StatEngine/components/ChartList/data';
+import { ChartMetaData } from '../../pages/StatEngine/components/ChartList/data';
 import { PlotlyChart, DataResults } from '../../pages/StatEngine/components/PlotlyViewer/data';
 
 declare namespace API {
@@ -59,7 +59,7 @@ declare namespace API {
   };
 
   type ChartList = {
-    data?: ChartData[];
+    data?: ChartMetaData[];
     total?: number;
     success?: boolean;
   };

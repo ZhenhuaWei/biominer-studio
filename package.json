@@ -57,6 +57,7 @@
     "antd": "^4.14.0",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
+    "handlebars": "^4.7.7",
     "handsontable": "^9.0.1",
     "lodash": "^4.17.11",
     "moment": "^2.25.3",

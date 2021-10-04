@@ -7,51 +7,26 @@ const genList = (current: number, pageSize: number) => {
   const chartListDataSource: API.ChartListItem[] = [];
 
   for (let i = 0; i < pageSize; i += 1) {
-    const index = (current - 1) * 10 + i;
     chartListDataSource.push({
-      id: `${index}`,
-      title: 'Line Regression',
-      maintainer: 'Jingcheng Yang',
-      description:
-        'Linear regression is a regression method for linear modeling of the relationship between independent variables and dependent variables.',
-      logo: 'https://s1.imagehub.cc/images/2020/08/31/82-JCQ9Fx-tuya.jpg',
+      name: 'Correlation Plot',
       version: 'v0.1.0',
-      readme: 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md',
+      description:
+        'It is used to investigate the dependence between multiple variables at the same time and to highlight the most correlated variables in a data table.',
+      category: 'Chart',
+      home: 'https://github.com/tservice-plugins/corrplot',
+      source: 'PGx',
+      short_name: 'corrplot',
+      icons: [
+        {
+          src: 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/biominer/corrplot-logo-144x144.png',
+          type: 'image/png',
+          sizes: '144x144',
+        },
+      ],
+      author: 'Jingcheng Yang',
+      maintainers: ['Jingcheng Yang'],
       tags: ['R', 'Chart'],
-      fields: [
-        {
-          title: '标题',
-          dataIndex: 'title',
-          formItemProps: {
-            rules: [{ required: true, message: '此项为必填项' }],
-          },
-        },
-        {
-          title: '状态',
-          dataIndex: 'state',
-          valueType: 'select',
-        },
-        { title: '标签', dataIndex: 'labels' },
-        {
-          title: '创建时间',
-          key: 'showTime',
-          dataIndex: 'createName',
-          valueType: 'date',
-        },
-        { title: '创建时间', dataIndex: 'created_at', valueType: 'dateRange' },
-      ],
-      dataKey: {
-        annoData: 'Anno Data',
-        data: 'Data',
-      },
-      examples: [
-        {
-          title: '',
-          key: '',
-          data: [],
-          arguments: {},
-        },
-      ],
+      readme: 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.md',
     });
   }
   chartListDataSource.reverse();

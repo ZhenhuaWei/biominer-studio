@@ -1,27 +1,39 @@
 import React, { useState, useEffect, memo } from 'react';
 import { List, Space, Tag } from 'antd';
+import { filter, map } from 'lodash';
 import { LikeOutlined, DislikeOutlined, FunctionOutlined } from '@ant-design/icons';
 
 // API Endpoint
 import { getCharts } from '@/services/ant-design-pro/api';
 
-import { ChartData } from './data';
+import { ChartMetaData, Icon } from './data';
 import './index.less';
 
 export type ChartListProps = {
-  onClickItem?: (chart: ChartData) => void;
+  onClickItem?: (chart: ChartMetaData) => void;
 };
 
 const ChartList: React.FC<ChartListProps> = (props) => {
   const { onClickItem } = props;
 
-  const [charts, setCharts] = useState<ChartData[]>([]);
+  const [charts, setCharts] = useState<ChartMetaData[]>([]);
   const [total, setTotal] = useState<number>(0);
 
   useEffect(() => {
     getCharts({}).then((response) => {
-      setCharts(response.data);
-      setTotal(response.total);
+      const chartList = filter(response.data, (item) => {
+        return item.category === 'Chart';
+      });
+
+      const updatedCharts = map(chartList, (item) => {
+        return {
+          ...item,
+          shortName: item.short_name,
+        };
+      });
+
+      setCharts(updatedCharts);
+      setTotal(updatedCharts.length);
     });
   }, []);
 
@@ -36,8 +48,12 @@ const ChartList: React.FC<ChartListProps> = (props) => {
     return `Total ${num} items`;
   };
 
-  const titleLink = (title: string, version: string) => {
-    return <a className="title">{`${title}- ${version}`}</a>;
+  const getLogo = (icons: Icon[]): string => {
+    return icons[0].src;
+  };
+
+  const titleLink = (name: string, version: string) => {
+    return <a className="title">{`${name}- ${version}`}</a>;
   };
 
   console.log('ChartList updated');
@@ -60,24 +76,25 @@ const ChartList: React.FC<ChartListProps> = (props) => {
       dataSource={charts}
       renderItem={(item) => (
         <List.Item
+          className="chart-item"
           onClick={() => {
             if (onClickItem) {
               onClickItem(item);
             }
           }}
-          key={item.id}
+          key={item.shortName}
           actions={[
             <IconText icon={LikeOutlined} text="156" key="list-vertical-star-o" />,
             <IconText icon={DislikeOutlined} text="1" key="list-vertical-like-o" />,
             <IconText icon={FunctionOutlined} text="2" key="list-vertical-message" />,
           ]}
-          extra={<img width={272} alt="logo" src={item.logo} />}
+          extra={<img alt="logo" src={getLogo(item.icons)} />}
         >
           <List.Item.Meta
-            title={titleLink(item.title, item.version)}
+            title={titleLink(item.name, item.version)}
             description={item.maintainer}
           />
-          {item.description}
+          <span className="description">{item.description}</span>
           {item.tags.map((tag) => {
             return <Tag key={tag}>{tag}</Tag>;
           })}

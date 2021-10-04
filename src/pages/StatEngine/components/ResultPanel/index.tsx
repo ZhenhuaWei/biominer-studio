@@ -14,7 +14,7 @@ import { memo } from 'react';
 import PlotlyViewer from '../PlotlyViewer/indexClass';
 import ChartList from '../ChartList';
 import LogViewer from '../LogViewer';
-import { ChartData } from '../ChartList/data';
+import { ChartMetaData } from '../ChartList/data';
 
 import { getDataResults } from '@/services/ant-design-pro/api';
 
@@ -24,7 +24,7 @@ import './index.less';
 const { TabPane } = Tabs;
 
 export type ResultPanelProps = {
-  onClickItem: (chart: ChartData) => void;
+  onClickItem: (chart: ChartMetaData) => void;
   logLink: string;
   resultId: string;
   plotlyId: string;

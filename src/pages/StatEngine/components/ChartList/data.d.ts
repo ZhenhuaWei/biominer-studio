@@ -23,15 +23,30 @@ export declare type Example = {
   };
 };
 
-export declare type ChartData = {
+export declare type Icon = {
+  // type: 'image/png', sizes: '192x192'
+  src: string;
+  type: string;
+  sizes: string;
+};
+
+export declare type ChartMetaData = {
   id: string;
-  title: string;
-  maintainer: string;
-  description: string;
-  logo: string;
+  name: string;
   version: string;
-  readme: string;
+  description: string;
+  category: string;
+  home: string;
+  source: string;
+  shortName: string;
+  icons: Icon[];
+  author: string;
+  maintainer: string;
   tags: string[];
+  readme: string;
+};
+
+export declare type ChartData = {
   fields: ProFormColumnsType<DataItem>[];
   dataKey: DataKey;
   examples: Example[];
