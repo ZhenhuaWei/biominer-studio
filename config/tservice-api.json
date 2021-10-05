@@ -638,5 +638,95 @@
         "summary": "It is used to investigate the dependence between multiple variables at the same time and to highlight the most correlated variables in a data table."
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "ChartListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "maintainer": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "readme": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagItem"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldItem"
+            }
+          },
+          "dataKey": {
+            "type": "object",
+            "properties": {
+              "annoData": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              }
+            }
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExampleItem"
+            }
+          }
+        }
+      },
+      "ChartList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartListItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "列表的内容总数",
+            "format": "int32"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaskList": {
+        "type": "object",
+        "properties": {
+          "page": {},
+          "page_size": {},
+          "owner": {},
+          "plugin_type": {},
+          "status": {},
+          "plugin_name": {}
+        }
+      }
+    }
   }
 }

@@ -4,6 +4,8 @@ import { Col, Row, Tabs, Space, Button, Tooltip, Modal } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-form';
 import Draggable from 'react-draggable';
 import { reactLocalStorage } from 'reactjs-localstorage';
+import { RouteComponentProps } from 'react-router-dom';
+import { StaticContext } from 'react-router';
 
 import {
   InfoCircleOutlined,
@@ -40,7 +42,12 @@ const logExample = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log';
 
 const { TabPane } = Tabs;
 
-const StatEngine: React.FC = () => {
+type LocationState = {
+  chart?: ChartMetaData;
+};
+
+const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>> = (props) => {
+  console.log('Stat Engine Props: ', props);
   const [leftSpan, setLeftSpan] = useState<number>(12);
   const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
 
@@ -49,7 +56,9 @@ const StatEngine: React.FC = () => {
   const [inDataContext, setInDataContext] = useState<boolean>(false);
 
   // Chart
-  const [currentChart, setCurrentChart] = useState<ChartMetaData | null>(null);
+  const [currentChart, setCurrentChart] = useState<ChartMetaData | null>(
+    (props.location.state && props.location.state.chart) || null,
+  );
   const [markdownLink, setMarkdownLink] = useState<string>('');
   const [argumentColumns, setArgumentColumns] = useState<ProFormColumnsType<DataItem>[]>([]);
   const [dataKey, setDataKey] = useState<DataKey>({

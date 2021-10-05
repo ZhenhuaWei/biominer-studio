@@ -51,6 +51,8 @@ export default {
   'menu.editor.koni': 'Koni Editor',
   // Custom
   'menu.stat-engine': 'Statistics',
+  'menu.stat-engine.index': 'Miner Studio',
+  'menu.stat-engine.chart-list': 'Charts',
   'menu.history-table': 'History',
   'menu.dataset': 'DataSet',
 };

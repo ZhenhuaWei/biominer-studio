@@ -3,8 +3,8 @@
 import { ChartMetaData } from '../../pages/StatEngine/components/ChartList/data';
 import { PlotlyChart, DataResults } from '../../pages/StatEngine/components/PlotlyViewer/data';
 
-declare namespace API {
-  type CurrentUser = {
+export declare namespace API {
+  export type CurrentUser = {
     name?: string;
     avatar?: string;
     userid?: string;
@@ -25,47 +25,59 @@ declare namespace API {
     phone?: string;
   };
 
-  type LoginResult = {
+  export type LoginResult = {
     status?: string;
     type?: string;
     currentAuthority?: string;
   };
 
-  type PageParams = {
+  export type PageParams = {
     current?: number;
     pageSize?: number;
   };
 
-  type RuleListItem = {
-    key?: number;
-    disabled?: boolean;
-    href?: string;
-    avatar?: string;
-    name?: string;
+  export type TaskListItem = {
+    id: string;
+    name: string;
+    plugin_name: string;
+    plugin_type: string;
+    percentage: number;
+    status: string;
+    started_time: string;
+    plugin_version: string;
     owner?: string;
-    desc?: string;
-    callNo?: number;
-    status?: number;
-    updatedAt?: string;
-    createdAt?: string;
-    progress?: number;
+    payload?: object;
+    finished_time: string;
+    description: string;
+    response: object;
   };
 
-  type RuleList = {
-    data?: RuleListItem[];
-    /** 列表的内容总数 */
+  export type TaskList = {
     total?: number;
-    success?: boolean;
+    current?: number;
+    pageSize?: number;
+    data?: TaskListItem;
   };
 
-  type ChartList = {
+  export type ChartList = {
     data?: ChartMetaData[];
     total?: number;
     success?: boolean;
   };
 
-  type PlotlyChart = PlotlyChart;
-  type DataResults = DataResults;
+  export type ChartSchema = {
+    schema: {
+      fields: any[];
+      examples: any[];
+      dataKey: {
+        annoData?: string;
+        data: string;
+      };
+    };
+  };
+
+  export type PlotlyChart = PlotlyChart;
+  export type DataResults = DataResults;
 
   type FakeCaptcha = {
     code?: number;

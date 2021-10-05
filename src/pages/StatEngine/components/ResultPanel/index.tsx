@@ -163,7 +163,7 @@ const ResultPanel: React.FC<ResultPanelProps> = (props) => {
         title="Chart Store"
         placement="right"
         closable
-        width="50%"
+        width="70%"
         onClose={() => {
           setChartsVisible(false);
         }}

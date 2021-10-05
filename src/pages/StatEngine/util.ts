@@ -1,4 +1,4 @@
-import Handlebars from 'handlebars';
+const Handlebars = require('handlebars/dist/handlebars');
 
 export const leftSeperator: string = '"#{{';
 export const leftReSeperator: RegExp = new RegExp('"#{{', 'g');

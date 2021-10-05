@@ -1,6 +1,13 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from 'umi';
+import { extend } from 'umi-request';
+import { API } from './typings';
+
+const request = extend({
+  prefix: 'http://127.0.0.1:8089',
+  timeout: 3000,
+  credentials: 'same-origin', // 默认请求是否带上cookie
+});
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
@@ -62,11 +69,18 @@ export async function getDataResults(id: string, params: {}, options?: { [key: s
   });
 }
 
-/** 获取Chart Schema GET /api/chart/<plugin_name> */
+/** 获取Chart Schema GET /api/chart/<plugin_name>-ui-schema */
 export async function getChartSchema(chartName: string, options?: { [key: string]: any }) {
-  return request<API.ChartSchema>('/api/chart/' + chartName, {
+  return request<API.ChartSchema>(`/api/chart/${chartName}-ui-schema`, {
     method: 'GET',
     params: {},
+    ...(options || {}),
+  });
+}
+
+export async function getChart(chartName: string, options?: { [key: string]: any }) {
+  return request<API.ChartList>(`/api/chart/${chartName}`, {
+    method: 'GET',
     ...(options || {}),
   });
 }
@@ -82,7 +96,7 @@ export async function getCharts(
   },
   options?: { [key: string]: any },
 ) {
-  return request<API.ChartList>('/api/charts', {
+  return request<API.ChartList>('/api/manifest', {
     method: 'GET',
     params: {
       ...params,
@@ -91,46 +105,36 @@ export async function getCharts(
   });
 }
 
-/** 获取规则列表 GET /api/rule */
-export async function rule(
+/** 获取规则列表 GET /api/tasks */
+export async function getTasks(
   params: {
     // query
     /** 当前的页码 */
     current?: number;
     /** 页面的容量 */
     pageSize?: number;
+    plugin_type?: string;
+    plugin_name?: string;
+    status?: string;
   },
   options?: { [key: string]: any },
 ) {
-  return request<API.RuleList>('/api/rule', {
+  let newParams = {};
+  for (const item of ['plugin_name', 'status']) {
+    if (params[item]) {
+      newParams[item] = params[item];
+    }
+  }
+
+  newParams['page'] = params.current;
+  newParams['page_size'] = params.pageSize;
+  newParams['plugin_type'] = 'ChartPlugin';
+
+  return request<API.TaskList>('/api/tasks', {
     method: 'GET',
     params: {
-      ...params,
+      ...newParams,
     },
-    ...(options || {}),
-  });
-}
-
-/** 新建规则 PUT /api/rule */
-export async function updateRule(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/rule', {
-    method: 'PUT',
-    ...(options || {}),
-  });
-}
-
-/** 新建规则 POST /api/rule */
-export async function addRule(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/rule', {
-    method: 'POST',
-    ...(options || {}),
-  });
-}
-
-/** 删除规则 DELETE /api/rule */
-export async function removeRule(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/rule', {
-    method: 'DELETE',
     ...(options || {}),
   });
 }

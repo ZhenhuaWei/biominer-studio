@@ -1,4 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
+import pages from '@/locales/en-US/pages';
 import { Request, Response } from 'express';
 import { parse } from 'url';
 
@@ -33,7 +34,7 @@ const genList = (current: number, pageSize: number) => {
   return chartListDataSource;
 };
 
-let chartListDataSource = genList(1, 1);
+let chartListDataSource = genList(1, 10);
 
 function getCharts(req: Request, res: Response, u: string) {
   let realUrl = u;
@@ -98,9 +99,8 @@ function getCharts(req: Request, res: Response, u: string) {
   const result = {
     data: dataSource,
     total: chartListDataSource.length,
-    success: true,
-    pageSize,
-    current: parseInt(`${params.current}`, 10) || 1,
+    page_size: pageSize,
+    page: parseInt(`${params.current}`, 10) || 1,
   };
 
   return res.json(result);

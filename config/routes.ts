@@ -31,7 +31,20 @@
     name: 'stat-engine',
     icon: 'experiment',
     path: '/stat-engine',
-    component: './StatEngine',
+    routes: [
+      {
+        name: 'index',
+        icon: 'experiment',
+        path: '/stat-engine/index',
+        component: './StatEngine',
+      },
+      {
+        name: 'chart-list',
+        icon: 'codepen',
+        path: '/stat-engine/chart-list',
+        component: './StatEngine/components/ChartList',
+      },
+    ],
   },
   {
     name: 'history-table',

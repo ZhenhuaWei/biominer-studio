@@ -6,6 +6,7 @@ import settingDrawer from './zh-CN/settingDrawer';
 import settings from './zh-CN/settings';
 import pages from './zh-CN/pages';
 import statEngine from './zh-CN/stat-engine';
+import historyTable from './zh-CN/history-table';
 
 export default {
   'navBar.lang': '语言',
@@ -24,4 +25,5 @@ export default {
   ...pwa,
   ...component,
   ...statEngine,
+  ...historyTable,
 };

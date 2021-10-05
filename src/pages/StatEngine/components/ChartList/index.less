@@ -1,4 +1,8 @@
 .chart-list {
+  height: calc(100vh - 65px);
+  background-color: #fff;
+  border: 1px solid #fff;
+  border-radius: 5px;
   cursor: pointer;
 
   .title {
@@ -10,7 +14,16 @@
     margin: 10px;
   }
 
+  .ant-spin-nested-loading {
+    height: calc(100vh - 120px);
+    overflow: scroll;
+  }
+
   .chart-item {
+    display: flex !important;
+    flex-direction: row;
+    margin-top: 16px;
+
     .ant-list-item-meta,
     .ant-list-item-meta-title {
       margin-bottom: 0;

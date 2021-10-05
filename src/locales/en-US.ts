@@ -6,6 +6,7 @@ import pwa from './en-US/pwa';
 import settingDrawer from './en-US/settingDrawer';
 import settings from './en-US/settings';
 import statEngine from './en-US/stat-engine';
+import historyTable from './en-US/history-table';
 
 export default {
   'navBar.lang': 'Languages',
@@ -24,4 +25,5 @@ export default {
   ...component,
   ...pages,
   ...statEngine,
+  ...historyTable,
 };

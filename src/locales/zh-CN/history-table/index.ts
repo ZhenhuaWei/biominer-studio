@@ -1,0 +1,16 @@
+export default {
+  'history-table.id': '编号',
+  'history-table.taskName': '任务名称',
+  'history-table.pluginName': '图表名称',
+  'history-table.pluginVersion': '版本',
+  'history-table.description': '描述',
+  'history-table.status': '状态',
+  'history-table.started': '运行中',
+  'history-table.finished': '已完成',
+  'history-table.failed': '已失败',
+  'history-table.startedAt': '开始时间',
+  'history-table.finishedAt': '完成时间',
+  'history-table.title': '任务列表',
+  'history-table.payload': '参数列表',
+  'history-table.percentage': '百分比',
+};

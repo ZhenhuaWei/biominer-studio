@@ -1,13 +1,18 @@
+import { useIntl } from 'umi';
 import React, { useState, useEffect, memo } from 'react';
 import { List, Space, Tag } from 'antd';
 import { filter, map } from 'lodash';
 import { LikeOutlined, DislikeOutlined, FunctionOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
 
 // API Endpoint
 import { getCharts } from '@/services/biominer/api';
 
 import { ChartMetaData, Icon } from './data';
 import './index.less';
+
+// Custom Data
+import { langData } from './lang';
 
 export type ChartListProps = {
   onClickItem?: (chart: ChartMetaData) => void;
@@ -18,6 +23,18 @@ const ChartList: React.FC<ChartListProps> = (props) => {
 
   const [charts, setCharts] = useState<ChartMetaData[]>([]);
   const [total, setTotal] = useState<number>(0);
+
+  const history = useHistory();
+
+  const intl = useIntl();
+  interface UIContext {
+    [key: string]: any;
+  }
+
+  const uiContext: UIContext = {};
+  Object.keys(langData).forEach((key) => {
+    uiContext[key] = intl.formatMessage(langData[key]);
+  });
 
   useEffect(() => {
     getCharts({}).then((response) => {
@@ -45,7 +62,7 @@ const ChartList: React.FC<ChartListProps> = (props) => {
   );
 
   const showTotal = (num: number) => {
-    return `Total ${num} items`;
+    return `${uiContext.totalItems}: ${num}`;
   };
 
   const getLogo = (icons: Icon[]): string => {
@@ -63,6 +80,14 @@ const ChartList: React.FC<ChartListProps> = (props) => {
       className="chart-list"
       itemLayout="vertical"
       size="large"
+      grid={{
+        xs: 1,
+        sm: 1,
+        md: 1,
+        lg: 1,
+        xl: 2,
+        xxl: 2,
+      }}
       pagination={{
         onChange: (page) => {
           console.log(page);
@@ -80,6 +105,10 @@ const ChartList: React.FC<ChartListProps> = (props) => {
           onClick={() => {
             if (onClickItem) {
               onClickItem(item);
+            } else {
+              history.push('/stat-engine/index', {
+                chart: item,
+              });
             }
           }}
           key={item.shortName}
