@@ -39,6 +39,12 @@
           background-repeat: no-repeat;
           background-size: 100% auto;
         }
+        .page-loading-header {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        }
         .page-loading-warp {
           display: flex;
           align-items: center;
@@ -189,7 +195,10 @@
           min-height: 420px;
         "
       >
-        <img src="<%= context.config.publicPath +'logo.png'%>" alt="logo" width="128" />
+        <div class="page-loading-header">
+          <img src="<%= context.config.publicPath +'logo.png'%>" alt="logo" width="64" />
+          <span style="font-size: 32px;">BioMiner</span>
+        </div>
         <div class="page-loading-warp">
           <div class="ant-spin ant-spin-lg ant-spin-spinning">
             <span class="ant-spin-dot ant-spin-dot-spin"
@@ -197,14 +206,6 @@
               ><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i
             ></span>
           </div>
-        </div>
-        <div style="display: flex; align-items: center; justify-content: center">
-          <img
-            src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
-            width="32"
-            style="margin-right: 8px"
-          />
-          BioMiner
         </div>
       </div>
     </div>

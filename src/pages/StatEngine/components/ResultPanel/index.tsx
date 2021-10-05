@@ -16,7 +16,7 @@ import ChartList from '../ChartList';
 import LogViewer from '../LogViewer';
 import { ChartMetaData } from '../ChartList/data';
 
-import { getDataResults } from '@/services/ant-design-pro/api';
+import { getDataResults } from '@/services/biominer/api';
 
 import { langData } from './lang';
 import './index.less';

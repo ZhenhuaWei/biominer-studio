@@ -1,0 +1,642 @@
+{
+  "swagger": "2.0",
+  "x-id": ["tservice.routes.services/api"],
+  "info": {
+    "title": "API Service for Tservice",
+    "description": "https://cljdoc.org/d/metosin/reitit",
+    "version": "v0.1.0"
+  },
+  "paths": {
+    "/api/version": {
+      "get": {
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [],
+        "tags": ["Utility"]
+      }
+    },
+    "/api/manifest": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {},
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [],
+        "tags": ["Utility"],
+        "summary": "Get the manifest data of all plugins."
+      }
+    },
+    "/api/download": {
+      "get": {
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "filelink",
+            "description": "File link, such as /40644dec-1abd-489f-a7a8-1011a86f40b0/log",
+            "type": null,
+            "required": true,
+            "title": "tservice.routes.specs/filelink",
+            "default": ""
+          }
+        ],
+        "tags": ["File"],
+        "summary": "Downloads a file"
+      }
+    },
+    "/api/upload": {
+      "post": {
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "files",
+            "description": "",
+            "type": null,
+            "required": true,
+            "x-anyOf": [
+              {},
+              {
+                "type": "array",
+                "items": {}
+              }
+            ]
+          }
+        ],
+        "tags": ["File"],
+        "summary": "Uploads File(s)."
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0
+                },
+                "page": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 1
+                },
+                "page_size": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 1
+                },
+                "data": {}
+              },
+              "required": ["total", "page", "page_size", "data"]
+            },
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "description": "Page, From 1.",
+            "format": "int64",
+            "default": 1,
+            "name": "page",
+            "type": "integer",
+            "title": "tservice.routes.specs/page",
+            "minimum": 0,
+            "required": false,
+            "in": "query"
+          },
+          {
+            "description": "Num of items per page.",
+            "format": "int64",
+            "default": 10,
+            "name": "page_size",
+            "type": "integer",
+            "title": "tservice.routes.specs/page_size",
+            "minimum": 0,
+            "required": false,
+            "in": "query"
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "description": "Owner name that you want to query.",
+            "type": null,
+            "required": false,
+            "title": "tservice.routes.specs/owner",
+            "default": "huangyechao"
+          },
+          {
+            "in": "query",
+            "name": "plugin_type",
+            "description": "Filter tasks by plugin_type field.",
+            "type": "string",
+            "required": false,
+            "enum": ["ReportPlugin", "ToolPlugin", "DataPlugin", "StatPlugin"],
+            "title": "tservice.routes.specs/plugin_type",
+            "default": "ReportPlugin"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Filter results by status field.",
+            "type": "string",
+            "required": false,
+            "enum": ["Failed", "Started", "Finished"],
+            "title": "tservice.routes.specs/status",
+            "default": "Started"
+          },
+          {
+            "in": "query",
+            "name": "plugin_name",
+            "description": "The name of the plugin",
+            "type": "string",
+            "required": false,
+            "title": "tservice.routes.specs/plugin_name",
+            "default": ""
+          }
+        ],
+        "summary": "Get tasks.",
+        "tags": ["Task"]
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Task ID",
+                      "title": "tservice.routes.specs/id",
+                      "default": "40644dec-1abd-489f-a7a8-1011a86f40b0"
+                    }
+                  },
+                  "required": ["id"]
+                }
+              },
+              "required": ["message"]
+            },
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "percentage": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "Percentage, From 0.",
+                  "title": "tservice.routes.specs/percentage",
+                  "default": 0
+                },
+                "owner": {
+                  "description": "Owner name that you want to query.",
+                  "title": "tservice.routes.specs/owner",
+                  "default": "huangyechao"
+                },
+                "plugin_version": {
+                  "type": "string",
+                  "description": "The version of the plugin",
+                  "title": "tservice.routes.specs/plugin_version",
+                  "default": ""
+                },
+                "started_time": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0,
+                  "description": "Started time of the record",
+                  "title": "tservice.routes.specs/started_time",
+                  "default": ""
+                },
+                "plugin_type": {
+                  "enum": ["ReportPlugin", "ToolPlugin", "DataPlugin", "StatPlugin"],
+                  "type": "string",
+                  "description": "Filter tasks by plugin_type field.",
+                  "title": "tservice.routes.specs/plugin_type",
+                  "default": "ReportPlugin"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the plugin",
+                  "title": "tservice.routes.specs/name",
+                  "default": ""
+                },
+                "status": {
+                  "enum": ["Failed", "Started", "Finished"],
+                  "type": "string",
+                  "description": "Filter results by status field.",
+                  "title": "tservice.routes.specs/status",
+                  "default": "Started"
+                },
+                "plugin_name": {
+                  "type": "string",
+                  "description": "The name of the plugin",
+                  "title": "tservice.routes.specs/plugin_name",
+                  "default": ""
+                },
+                "response": {
+                  "type": "object",
+                  "description": "Response of the task",
+                  "title": "tservice.routes.specs/response",
+                  "default": ""
+                },
+                "finished_time": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0,
+                  "description": "Finished time of the record",
+                  "title": "tservice.routes.specs/finished_time",
+                  "default": ""
+                },
+                "payload": {
+                  "type": "object",
+                  "description": "Payload of the task",
+                  "title": "tservice.routes.specs/payload",
+                  "default": ""
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the task",
+                  "title": "tservice.routes.specs/description",
+                  "default": ""
+                }
+              },
+              "required": ["name", "plugin_name", "plugin_type", "plugin_version"]
+            }
+          }
+        ],
+        "summary": "Create an task.",
+        "tags": ["Task"]
+      }
+    },
+    "/api/tasks/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object"
+            },
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Task ID",
+            "type": null,
+            "required": true,
+            "title": "tservice.routes.specs/id",
+            "default": "40644dec-1abd-489f-a7a8-1011a86f40b0"
+          }
+        ],
+        "summary": "Get a task by id.",
+        "tags": ["Task"]
+      },
+      "delete": {
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Task ID",
+            "type": null,
+            "required": true,
+            "title": "tservice.routes.specs/id",
+            "default": "40644dec-1abd-489f-a7a8-1011a86f40b0"
+          }
+        ],
+        "summary": "Delete a task.",
+        "tags": ["Task"]
+      }
+    },
+    "/api/tool/xps2pdf": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object"
+            },
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [],
+        "tags": ["Tool"],
+        "summary": "A json schema for xps2pdf"
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "schema": null,
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filepath": {
+                  "type": "string",
+                  "x-allOf": [
+                    {
+                      "type": "string"
+                    },
+                    {}
+                  ],
+                  "description": "File path for covertor.",
+                  "title": "tservice.plugins.xps2pdf/filepath",
+                  "default": null
+                },
+                "pdf_mode": {
+                  "type": "boolean",
+                  "description": "PDF Mode?",
+                  "title": "tservice.plugins.xps2pdf/pdf_mode",
+                  "default": true
+                },
+                "zip_mode": {
+                  "type": "boolean",
+                  "description": "ZIP Mode?",
+                  "title": "tservice.plugins.xps2pdf/zip_mode",
+                  "default": true
+                }
+              },
+              "required": ["filepath"]
+            }
+          }
+        ],
+        "tags": ["Tool"],
+        "summary": "Create a(n) task for :ToolPlugin plugin xps2pdf."
+      }
+    },
+    "/api/chart/corrplot": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object"
+            },
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [],
+        "tags": ["Chart"],
+        "summary": "A json schema for corrplot plugin."
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "schema": {
+              "type": "object"
+            },
+            "description": ""
+          }
+        },
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "datafile": {
+                  "type": "string",
+                  "description": "A path for data file.",
+                  "title": "tservice.plugins.corrplot/datafile",
+                  "default": ""
+                },
+                "corr_vars": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Variables.",
+                  "title": "tservice.plugins.corrplot/corr_vars",
+                  "default": null
+                },
+                "sig_level": {
+                  "description": "Significant level, greater than 0 and less than 1.",
+                  "title": "tservice.plugins.corrplot/sig_level",
+                  "default": 0.05
+                },
+                "hc_order": {
+                  "enum": [true, false],
+                  "type": "string",
+                  "description": "Logical value. If TRUE, correlation matrix will be hc.ordered using hclust function.",
+                  "title": "tservice.plugins.corrplot/hc_order",
+                  "default": true
+                },
+                "hc_method": {
+                  "enum": [
+                    "average",
+                    "complete",
+                    "ward.D2",
+                    "ward.D",
+                    "mcquitty",
+                    "single",
+                    "centroid",
+                    "median"
+                  ],
+                  "type": "string",
+                  "description": "The agglomeration method to be used in hclust (see ?hclust).",
+                  "title": "tservice.plugins.corrplot/hc_method",
+                  "default": "complete"
+                },
+                "corr_type": {
+                  "enum": ["upper", "full", "lower"],
+                  "type": "string",
+                  "description": "full (default), lower or upper display.",
+                  "title": "tservice.plugins.corrplot/corr_type",
+                  "default": "full"
+                },
+                "method": {
+                  "enum": ["square", "circle"],
+                  "type": "string",
+                  "description": "The visualization method of correlation matrix to be used. Allowed values are square (default), circle.",
+                  "title": "tservice.plugins.corrplot/method",
+                  "default": "square"
+                }
+              },
+              "required": ["datafile", "corr_vars"]
+            }
+          }
+        ],
+        "tags": ["Chart"],
+        "summary": "It is used to investigate the dependence between multiple variables at the same time and to highlight the most correlated variables in a data table."
+      }
+    }
+  }
+}

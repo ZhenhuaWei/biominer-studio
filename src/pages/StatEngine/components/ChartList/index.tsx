@@ -4,7 +4,7 @@ import { filter, map } from 'lodash';
 import { LikeOutlined, DislikeOutlined, FunctionOutlined } from '@ant-design/icons';
 
 // API Endpoint
-import { getCharts } from '@/services/ant-design-pro/api';
+import { getCharts } from '@/services/biominer/api';
 
 import { ChartMetaData, Icon } from './data';
 import './index.less';

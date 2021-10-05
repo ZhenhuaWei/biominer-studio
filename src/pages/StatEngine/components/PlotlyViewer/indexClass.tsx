@@ -6,7 +6,7 @@ import PlotlyEditor from 'react-chart-editor';
 
 import * as localeDictionary from 'plotly.js/lib/locales/zh-cn';
 import { PlotlyEditorState, Data, Layout, Frames } from './data';
-import { getPlotlyData } from '@/services/ant-design-pro/api';
+import { getPlotlyData } from '@/services/biominer/api';
 
 import 'react-chart-editor/lib/react-chart-editor.css';
 import './index.less';

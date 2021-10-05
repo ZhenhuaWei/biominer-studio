@@ -51,4 +51,6 @@ export default {
   'menu.editor.koni': '拓扑编辑器',
   // Custom
   'menu.stat-engine': '统计分析',
+  'menu.history-table': '历史记录',
+  'menu.dataset': '数据集',
 };

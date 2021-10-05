@@ -3,7 +3,7 @@ import { getLocale } from 'umi';
 import * as plotly from 'plotly.js/dist/plotly';
 import PlotlyChart from 'react-plotly.js';
 import PlotlyEditor from 'react-chart-editor';
-import { getPlotlyData } from '@/services/ant-design-pro/api';
+import { getPlotlyData } from '@/services/biominer/api';
 
 import * as localeDictionary from 'plotly.js/lib/locales/zh-cn';
 import { PlotlyEditorState, Data, Layout, Frames } from './data';

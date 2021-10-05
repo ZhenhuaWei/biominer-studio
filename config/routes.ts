@@ -22,19 +22,10 @@
     component: './Welcome',
   },
   {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
-    routes: [
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
-      },
-    ],
+    name: 'dataset',
+    icon: 'database',
+    path: '/dataset',
+    component: './DataSet',
   },
   {
     name: 'stat-engine',
@@ -43,10 +34,10 @@
     component: './StatEngine',
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    name: 'history-table',
+    icon: 'history',
+    path: '/history-table',
+    component: './HistoryTable',
   },
   {
     path: '/',

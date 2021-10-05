@@ -51,4 +51,6 @@ export default {
   'menu.editor.koni': 'Koni Editor',
   // Custom
   'menu.stat-engine': 'Statistics',
+  'menu.history-table': 'History',
+  'menu.dataset': 'DataSet',
 };

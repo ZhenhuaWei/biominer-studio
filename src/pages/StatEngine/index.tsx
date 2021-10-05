@@ -28,7 +28,7 @@ import { DataLoader } from './components/Common/data';
 import { DataKey, ChartMetaData, DataItem } from './components/ChartList/data';
 
 // Custom API
-import { getChartSchema } from '@/services/ant-design-pro/api';
+import { getChartSchema } from '@/services/biominer/api';
 
 // Custom Data
 import { langData } from './lang';

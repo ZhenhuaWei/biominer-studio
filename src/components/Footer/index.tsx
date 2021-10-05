@@ -6,29 +6,29 @@ export default () => {
   const intl = useIntl();
   const defaultMessage = intl.formatMessage({
     id: 'app.copyright.produced',
-    defaultMessage: '蚂蚁集团体验技术部出品',
+    defaultMessage: '智汇医圈联盟出品',
   });
 
   return (
     <DefaultFooter
-      copyright={`2020 ${defaultMessage}`}
+      copyright={`2015-${new Date().getFullYear()} ${defaultMessage}`}
       links={[
         {
-          key: 'BioMiner',
+          key: 'biominer',
           title: 'BioMiner',
-          href: 'https://pro.ant.design',
+          href: 'https://www.yuque.com/biominer',
           blankTarget: true,
         },
         {
           key: 'github',
           title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
+          href: 'https://github.com/biominer-lab',
           blankTarget: true,
         },
         {
-          key: 'ClinicoOmics',
+          key: 'clinico-omics',
           title: 'ClinicoOmics',
-          href: 'https://ant.design',
+          href: 'https://www.yuque.com/clinico-omics',
           blankTarget: true,
         },
       ]}
