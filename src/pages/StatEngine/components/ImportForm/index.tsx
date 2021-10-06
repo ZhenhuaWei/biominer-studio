@@ -30,13 +30,16 @@ const ImportForm: React.FC<ImportFormProps> = (props) => {
 
   const onSearch = (externalURL: string) => {
     setLoadActive(true);
-    console.log('onSearch: ', externalURL);
-    onLoad({
-      dataSource: externalURL,
-      dataSourceType: 'csvFile',
-      queryParams: {},
-      dataType: 'objectArray',
-    });
+    // TODO: Robust?
+    if (externalURL.length > 0) {
+      console.log('onSearch: ', externalURL);
+      onLoad({
+        dataSource: externalURL,
+        dataSourceType: 'csvFile',
+        queryParams: {},
+        dataType: 'objectArray',
+      });
+    }
   };
 
   console.log('ImportForm updated');
@@ -55,7 +58,7 @@ const ImportForm: React.FC<ImportFormProps> = (props) => {
             <Search
               placeholder="Input your data with URL"
               style={{ width: '80%' }}
-              disabled={!exampleLink || loadActive}
+              // disabled={!exampleLink || loadActive}
               onSearch={onSearch}
               value={exampleLink}
               enterButton="Load"
@@ -68,13 +71,13 @@ const ImportForm: React.FC<ImportFormProps> = (props) => {
             </Tooltip>
           </Row>
         </TabPane>
-        <TabPane tab={<span>Browser</span>} key="2">
+        <TabPane tab={<span>Browser</span>} key="2" disabled>
           <Row className="import-box">
             <Button>Browser Remote Files</Button>
             <Row>Supported file types: CSV, TSV</Row>
           </Row>
         </TabPane>
-        <TabPane tab={<span>DataSets</span>} key="3">
+        <TabPane tab={<span>DataSets</span>} key="3" disabled>
           <Row className="import-box">
             <Button>Browser DataSets</Button>
           </Row>

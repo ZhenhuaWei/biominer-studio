@@ -12,13 +12,15 @@ import 'react-chart-editor/lib/react-chart-editor.css';
 import './index.less';
 
 export type PlotlyViewerProps = {
-  dataSource?: string;
+  dataSources?: object;
+  dataSourceOptions?: object[];
   handleUpdate?: (state: PlotlyEditorState) => void;
   mode?: string;
+  plotlyId: string;
 };
 
 const PlotlyViewer: React.FC<PlotlyViewerProps> = (props) => {
-  const { dataSource, handleUpdate, mode } = props;
+  const { dataSources, handleUpdate, mode, plotlyId } = props;
 
   const [data, setData] = useState<Data>([]);
   const [layout, setLayout] = useState<Layout>({});
@@ -38,15 +40,15 @@ const PlotlyViewer: React.FC<PlotlyViewerProps> = (props) => {
   };
 
   useEffect(() => {
-    if (dataSource) {
+    if (plotlyId) {
       // Need to set autorange to true
-      getPlotlyData('fig4', {}).then((response) => {
+      getPlotlyData({ filelink: plotlyId }).then((response) => {
         setData(response.data);
         setLayout(response.layout);
         setFrames(response.frames);
       });
     }
-  }, [dataSource]);
+  }, [plotlyId]);
 
   // const handleResize = () => {
   //   if (ref.state.graphDiv instanceof HTMLElement) plotly.Plots.resize(ref.state.graphDiv);

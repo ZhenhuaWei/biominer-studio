@@ -39,8 +39,8 @@ export default class ChartEditor extends React.PureComponent<ChartEditorProps, C
   }
 
   componentWillMount() {
-    if (this.props.plotlyId.length > 0) {
-      getPlotlyData(this.props.plotlyId, {}).then((response) => {
+    if (this.props.plotlyId && this.props.plotlyId.length > 0) {
+      getPlotlyData({ filelink: this.props.plotlyId }).then((response) => {
         this.setState({
           data: response.data,
           layout: response.layout,

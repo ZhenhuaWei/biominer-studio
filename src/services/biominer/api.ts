@@ -3,8 +3,10 @@
 import { extend } from 'umi-request';
 import { API } from './typings';
 
+export const baseUrl = 'http://127.0.0.1:8089';
+
 const request = extend({
-  prefix: 'http://127.0.0.1:8089',
+  prefix: baseUrl,
   timeout: 3000,
   credentials: 'same-origin', // 默认请求是否带上cookie
 });
@@ -47,20 +49,14 @@ export async function getNotices(options?: { [key: string]: any }) {
   });
 }
 
-/** 获取Plotly Data for Chart GET /api/figure */
-export async function getPlotlyData(id: string, params: {}, options?: { [key: string]: any }) {
-  return request<API.PlotlyChart>(`/api/figure/${id}`, {
-    method: 'GET',
-    params: {
-      ...params,
-    },
-    ...(options || {}),
-  });
-}
-
-/** 获取Plotly Raw Data for Chart GET /api/data */
-export async function getDataResults(id: string, params: {}, options?: { [key: string]: any }) {
-  return request<API.DataResults>(`/api/data/${id}`, {
+/** 获取Plotly Data/Result for Chart GET /api/download */
+export async function getPlotlyData(
+  params: {
+    filelink: string;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.PlotlyChart>(`/api/download`, {
     method: 'GET',
     params: {
       ...params,
@@ -85,6 +81,14 @@ export async function getChart(chartName: string, options?: { [key: string]: any
   });
 }
 
+export async function postChart(chartName: string, payload: any, options?: { [key: string]: any }) {
+  return request<any>(`/api/chart/${chartName}`, {
+    method: 'POST',
+    data: payload,
+    ...(options || {}),
+  });
+}
+
 /** 获取Chart列表 GET /api/charts */
 export async function getCharts(
   params: {
@@ -105,7 +109,15 @@ export async function getCharts(
   });
 }
 
-/** 获取规则列表 GET /api/tasks */
+/** 获取Task GET /api/tasks/${taskId} */
+export async function getTask(taskId: string, options?: { [key: string]: any }) {
+  return request<API.TaskListItem>(`/api/tasks/${taskId}`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+/** 获取列表 GET /api/tasks */
 export async function getTasks(
   params: {
     // query

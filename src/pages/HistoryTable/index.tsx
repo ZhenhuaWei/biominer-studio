@@ -1,4 +1,5 @@
 import { Drawer, message } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 import React, { useState, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -33,18 +34,6 @@ const TableList: React.FC = () => {
       hideInTable: true,
       hideInSearch: true,
       hideInForm: true,
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
     },
     {
       title: <FormattedMessage id="history-table.taskName" defaultMessage="Task Name" />,
@@ -73,8 +62,15 @@ const TableList: React.FC = () => {
             onClick={() => {
               getChart(entity.plugin_name)
                 .then((response) => {
+                  const result = entity.response;
                   history.push('/stat-engine/index', {
                     chart: response,
+                    result: {
+                      results: result.results,
+                      charts: result.charts,
+                      log: result.log,
+                      taskId: result.task_id,
+                    },
                   });
                 })
                 .catch((error) => {
@@ -83,6 +79,7 @@ const TableList: React.FC = () => {
                 });
             }}
           >
+            <EyeOutlined />
             {dom}
           </a>
         );

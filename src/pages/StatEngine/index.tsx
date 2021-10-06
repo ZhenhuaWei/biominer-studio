@@ -1,6 +1,6 @@
 import { useIntl } from 'umi';
 import { GridContent } from '@ant-design/pro-layout';
-import { Col, Row, Tabs, Space, Button, Tooltip, Modal } from 'antd';
+import { Col, Row, Tabs, Space, Button, Tooltip, Modal, message, Spin } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-form';
 import Draggable from 'react-draggable';
 import { reactLocalStorage } from 'reactjs-localstorage';
@@ -27,10 +27,10 @@ import ResultPanel from './components/ResultPanel';
 // Custom DataType
 import { Bound } from './data';
 import { DataLoader } from './components/Common/data';
-import { DataKey, ChartMetaData, DataItem } from './components/ChartList/data';
+import { DataKey, ChartMetaData, DataItem, ChartResult } from './components/ChartList/data';
 
 // Custom API
-import { getChartSchema } from '@/services/biominer/api';
+import { getChartSchema, postChart, getTask } from '@/services/biominer/api';
 
 // Custom Data
 import { langData } from './lang';
@@ -38,16 +38,24 @@ import { langData } from './lang';
 // Custom Helper
 import { render as renderTemplate } from './util';
 
-const logExample = 'http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/test.log';
-
 const { TabPane } = Tabs;
 
 type LocationState = {
   chart?: ChartMetaData;
+  result?: ChartResult;
 };
 
 const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>> = (props) => {
-  console.log('Stat Engine Props: ', props);
+  const intl = useIntl();
+  interface UIContext {
+    [key: string]: any;
+  }
+
+  const uiContext: UIContext = {};
+  Object.keys(langData).forEach((key) => {
+    uiContext[key] = intl.formatMessage(langData[key]);
+  });
+
   const [leftSpan, setLeftSpan] = useState<number>(12);
   const [resizeBtnActive, setResizeBtnActive] = useState<boolean>(false);
 
@@ -65,20 +73,24 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
     annoData: 'Anno',
     data: 'Data',
   });
+  // Must be a json string
+  const [argumentFields, setArgumentFields] = useState<string>('{}');
 
   // Data & Anno Data
   const [data, setData] = useState<any[][]>([]);
   const [annoData, setAnnoData] = useState<any[][]>([]);
   const [dataLoader, setDataLoader] = useState<{ [key: string]: DataLoader }>({});
-  const [resultData, setResultData] = useState<{ resultId: string; plotlyId: string }>({
-    resultId: '',
-    plotlyId: 'fig4',
-  });
-  // Must be a json string
-  const [argumentFields, setArgumentFields] = useState<string>('{}');
+  const [resultData, setResultData] = useState<ChartResult | null>(
+    (props.location.state && props.location.state.result) || {
+      results: [],
+      charts: [],
+      taskId: '',
+      log: '',
+    },
+  );
 
-  // Right Panel
-  const [logLink, setLogLink] = useState<string>(logExample);
+  // Result
+  const [resultLoading, setResultLoading] = useState<boolean>(false);
 
   // Modal
   const [modalDisabled, setModalDisabled] = useState<boolean>(false);
@@ -107,29 +119,36 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
     setModalVisible(false);
   };
 
+  const resetFields = (fields: any[]): any => {
+    if (fields && Object.entries(fields).length > 0) {
+      const fieldsString = JSON.stringify(fields);
+
+      setArgumentFields(fieldsString);
+      const renderedFields = renderTemplate(fieldsString, {
+        columns: [],
+        datafile: [],
+      });
+
+      setArgumentColumns(renderedFields);
+      console.log('Fields: ', fields, renderedFields);
+    }
+  };
+
   const selectItem = useCallback(
     (chart: ChartMetaData) => {
-      getChartSchema(chart.shortName).then((response) => {
+      getChartSchema(chart.short_name).then((response) => {
         const schema = {
           ...response.schema,
         };
 
-        // setCurrentChart(chart);
-        // README
+        // Reset README
         setMarkdownLink(chart.readme);
+
         // Reset Argument
-        const fieldsString = JSON.stringify(schema.fields);
-        setArgumentFields(fieldsString);
-        const fields = renderTemplate(fieldsString, {
-          columns: [],
-          datafile: [],
-        });
-        console.log('Fields: ', fields);
-        setArgumentColumns(fields);
+        resetFields(schema.fields);
+
         // Reset DataKey
         setDataKey(schema.dataKey);
-        // Reset Log Container
-        setLogLink('');
 
         // Save currentChart into localStorage
         reactLocalStorage.setObject('BIO_MINER_CURRENT_CHART', chart);
@@ -143,22 +162,43 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
   };
 
   const changeDataTab = (key: string) => {
-    if (key !== 'arguments') {
-      setInDataContext(isInDataContext(key));
-    }
+    // Why?
+    // if (key !== 'arguments') {
+    //   setInDataContext(isInDataContext(key));
+    // }
+    setInDataContext(isInDataContext(key));
 
     setCurrentActiveKey(key);
   };
 
-  const intl = useIntl();
-  interface UIContext {
-    [key: string]: any;
-  }
-
-  const uiContext: UIContext = {};
-  Object.keys(langData).forEach((key) => {
-    uiContext[key] = intl.formatMessage(langData[key]);
-  });
+  const autoFetchTask = (taskId: string) => {
+    const interval = setInterval(() => {
+      if (taskId.length > 0) {
+        getTask(taskId)
+          .then((resp) => {
+            if (resp.status === 'Finished') {
+              setResultData({
+                results: resp.response.results,
+                charts: resp.response.charts,
+                log: resp.response.log,
+                taskId: resp.response.task_id,
+              });
+              setResultLoading(false);
+              message.success('Load chart...');
+              clearInterval(interval);
+            } else if (resp.status === 'Failed') {
+              setResultLoading(false);
+              message.error('Something wrong, please check the log for more details.');
+              clearInterval(interval);
+            }
+          })
+          .catch((error) => {
+            console.log('Get Task Error: ', error);
+            clearInterval(interval);
+          });
+      }
+    }, 1000);
+  };
 
   const summaryOperations = (
     <Space>
@@ -194,14 +234,15 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
         if (
           tableHeader.length > 0 &&
           dataLoader['data'].dataSource &&
-          dataLoader['data'].dataSource.length > 0
+          dataLoader['data'].dataSource.length > 0 &&
+          argumentFields.length > 0
         ) {
           const fields = renderTemplate(argumentFields, {
             columns: tableHeader,
             datafile: [dataLoader['data'].dataSource],
           });
-          console.log('Updated Fields: ', fields);
           setArgumentColumns(fields);
+          console.log('updateData - Updated Fields: ', argumentFields, fields);
         }
       }
 
@@ -212,13 +253,34 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
     [dataLoader],
   );
 
-  const getRightSpan = function (customLeftSpan: number): number {
+  const onSubmit = (values: any) => {
+    const chartName: string = currentChart?.short_name || '';
+    console.log('onSubmit Chart: ', currentChart, values);
+    return new Promise<ChartResult>((resolve, reject) => {
+      postChart(chartName, values)
+        .then((response) => {
+          console.log('Post Chart: ', response);
+          message.success(`Create the chart ${chartName} successfully.`);
+          setResultLoading(true);
+          autoFetchTask(response.task_id);
+          resolve(response);
+        })
+        .catch((error) => {
+          message.warn('Unknown error, please retry later.');
+          console.log('Post Chart Error: ', error);
+          reject(error);
+        });
+    });
+  };
+
+  const getRightSpan = (customLeftSpan: number): number => {
     return 24 - customLeftSpan ? 24 - customLeftSpan : 24;
   };
 
   useEffect(() => {
     // Restore data from localStorage
-    const chart = reactLocalStorage.getObject('BIO_MINER_CURRENT_CHART');
+    // @ts-ignore
+    const chart: ChartMetaData = reactLocalStorage.getObject('BIO_MINER_CURRENT_CHART');
     if (Object.entries(chart).length > 0) {
       setCurrentChart(chart);
       selectItem(chart);
@@ -227,87 +289,91 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
 
   return (
     <GridContent>
-      <Row className="stat-engine" gutter={8}>
-        <Col className="left" xxl={leftSpan} xl={leftSpan} lg={leftSpan} md={24} sm={24} xs={24}>
-          <Row className="left__content">
-            <Col className="left__tabs">
-              <Tabs
-                onChange={(key) => {
-                  changeDataTab(key);
-                }}
-                activeKey={currentActiveKey}
-                defaultActiveKey="summary"
-                className="left__tabs__arguments"
-                tabBarExtraContent={summaryOperations}
-              >
-                <TabPane
-                  tab={
-                    <span>
-                      <InfoCircleOutlined />
-                      {uiContext.summary}
-                    </span>
-                  }
-                  key="summary"
+      <Spin spinning={resultLoading} style={{ marginTop: '50px' }}>
+        <Row className="stat-engine" gutter={8}>
+          <Col className="left" xxl={leftSpan} xl={leftSpan} lg={leftSpan} md={24} sm={24} xs={24}>
+            <Row className="left__content">
+              <Col className="left__tabs">
+                <Tabs
+                  onChange={(key) => {
+                    changeDataTab(key);
+                  }}
+                  activeKey={currentActiveKey}
+                  defaultActiveKey="summary"
+                  className="left__tabs__arguments"
+                  tabBarExtraContent={summaryOperations}
                 >
-                  <MarkdownViewer url={markdownLink} />
-                </TabPane>
-                <TabPane tab={<span>Data</span>} key="data">
-                  <DataTable
-                    dataKey="data"
-                    updateData={updateData}
-                    dataLoader={dataLoader['data']}
-                    height="calc(100vh - 145px)"
-                    width="100%"
-                  ></DataTable>
-                </TabPane>
-                {dataKey['annoData'] ? (
-                  <TabPane tab={<span>Anno</span>} key="annoData">
+                  <TabPane
+                    tab={
+                      <span>
+                        <InfoCircleOutlined />
+                        {uiContext.summary}
+                      </span>
+                    }
+                    key="summary"
+                  >
+                    <MarkdownViewer url={markdownLink} />
+                  </TabPane>
+                  <TabPane tab={<span>Data</span>} key="data">
                     <DataTable
-                      dataKey="annoData"
+                      dataKey="data"
                       updateData={updateData}
-                      dataLoader={dataLoader['annoData']}
+                      dataLoader={dataLoader['data']}
                       height="calc(100vh - 145px)"
                       width="100%"
                     ></DataTable>
                   </TabPane>
-                ) : null}
-                <TabPane tab={<span>{uiContext.arguments}</span>} key="arguments">
-                  <ArgumentForm
-                    labelSpan={12}
-                    height="calc(100% - 62px)"
-                    columns={argumentColumns}
-                  ></ArgumentForm>
-                </TabPane>
-              </Tabs>
-            </Col>
-            <Resizer
-              className="left__divider"
-              HoverHandler={setResizeBtnActive}
-              ClickHandler={setLeftSpan}
-              btnActive={resizeBtnActive}
-            ></Resizer>
-          </Row>
-        </Col>
-        <Col
-          className="right"
-          xxl={getRightSpan(leftSpan)}
-          xl={getRightSpan(leftSpan)}
-          lg={getRightSpan(leftSpan)}
-          md={24}
-          sm={24}
-          xs={24}
-        >
-          <Row className="right__content">
-            <ResultPanel
-              resultId={resultData.resultId}
-              plotlyId={resultData.plotlyId}
-              responsiveKey={leftSpan}
-              logLink={logLink}
-              onClickItem={selectItem}
-            ></ResultPanel>
-          </Row>
-        </Col>
-      </Row>
+                  {dataKey['annoData'] ? (
+                    <TabPane tab={<span>Anno</span>} key="annoData">
+                      <DataTable
+                        dataKey="annoData"
+                        updateData={updateData}
+                        dataLoader={dataLoader['annoData']}
+                        height="calc(100vh - 145px)"
+                        width="100%"
+                      ></DataTable>
+                    </TabPane>
+                  ) : null}
+                  <TabPane tab={<span>{uiContext.arguments}</span>} key="arguments">
+                    <ArgumentForm
+                      labelSpan={12}
+                      height="calc(100% - 62px)"
+                      onSubmit={onSubmit}
+                      columns={argumentColumns}
+                    ></ArgumentForm>
+                  </TabPane>
+                </Tabs>
+              </Col>
+              <Resizer
+                className="left__divider"
+                HoverHandler={setResizeBtnActive}
+                ClickHandler={setLeftSpan}
+                btnActive={resizeBtnActive}
+              ></Resizer>
+            </Row>
+          </Col>
+          <Col
+            className="right"
+            xxl={getRightSpan(leftSpan)}
+            xl={getRightSpan(leftSpan)}
+            lg={getRightSpan(leftSpan)}
+            md={24}
+            sm={24}
+            xs={24}
+          >
+            <Row className="right__content">
+              <ResultPanel
+                results={resultData?.results || []}
+                charts={resultData?.charts || []}
+                taskId={resultData?.taskId || ''}
+                responsiveKey={leftSpan}
+                logLink={resultData?.log || ''}
+                onClickItem={selectItem}
+              ></ResultPanel>
+            </Row>
+          </Col>
+        </Row>
+      </Spin>
       <Modal
         className="import-form-modal"
         width="50%"

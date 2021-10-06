@@ -49,7 +49,13 @@ export declare namespace API {
     payload?: object;
     finished_time: string;
     description: string;
-    response: object;
+    response: {
+      charts: array;
+      results: array;
+      response_type: string;
+      task_id: string;
+      log: string;
+    };
   };
 
   export type TaskList = {

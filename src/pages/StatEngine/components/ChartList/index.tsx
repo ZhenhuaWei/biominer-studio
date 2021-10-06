@@ -42,15 +42,8 @@ const ChartList: React.FC<ChartListProps> = (props) => {
         return item.category === 'Chart';
       });
 
-      const updatedCharts = map(chartList, (item) => {
-        return {
-          ...item,
-          shortName: item.short_name,
-        };
-      });
-
-      setCharts(updatedCharts);
-      setTotal(updatedCharts.length);
+      setCharts(chartList);
+      setTotal(chartList.length);
     });
   }, []);
 
@@ -108,10 +101,11 @@ const ChartList: React.FC<ChartListProps> = (props) => {
             } else {
               history.push('/stat-engine/index', {
                 chart: item,
+                result: null,
               });
             }
           }}
-          key={item.shortName}
+          key={item.short_name}
           actions={[
             <IconText icon={LikeOutlined} text="156" key="list-vertical-star-o" />,
             <IconText icon={DislikeOutlined} text="1" key="list-vertical-like-o" />,

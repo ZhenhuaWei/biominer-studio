@@ -9,6 +9,7 @@ import { Button, Empty, Row, Tooltip, Space, Col } from 'antd';
 import { EditOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { useState, memo } from 'react';
+import { ChartResult } from '../ChartList/data';
 
 import './index.less';
 
@@ -19,10 +20,11 @@ export type ArgumentProps = {
   columns: ProFormColumnsType<DataItem>[];
   height?: string;
   labelSpan?: number;
+  onSubmit?: (values: any) => Promise<ChartResult>;
 };
 
 const ArgumentForm: React.FC<ArgumentProps> = (props) => {
-  const { columns, height, labelSpan } = props;
+  const { columns, height, labelSpan, onSubmit } = props;
 
   const activateBtn = (
     <FormItem
@@ -87,7 +89,15 @@ const ArgumentForm: React.FC<ArgumentProps> = (props) => {
         layoutType={layoutType}
         layout="vertical"
         onFinish={async (values) => {
-          console.log(values);
+          if (onSubmit) {
+            onSubmit(values)
+              .then((response) => {
+                console.log('onSubmit ArgumentForm: ', response);
+              })
+              .catch((error) => {
+                console.log('onSubmit ArgumentForm Error: ', error);
+              });
+          }
         }}
         columns={columns}
       />

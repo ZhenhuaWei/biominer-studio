@@ -38,7 +38,7 @@ export declare type ChartMetaData = {
   category: string;
   home: string;
   source: string;
-  shortName: string;
+  short_name: string;
   icons: Icon[];
   author: string;
   maintainer: string;
@@ -50,4 +50,11 @@ export declare type ChartData = {
   fields: ProFormColumnsType<DataItem>[];
   dataKey: DataKey;
   examples: Example[];
+};
+
+export declare type ChartResult = {
+  results: string[];
+  charts: string[];
+  taskId: string;
+  log: string;
 };

@@ -11,11 +11,9 @@ const genList = (current: number, pageSize: number) => {
     taskListDataSource.push({
       response: {
         log: '/726338b0-24f7-11ec-b2cc-bd78a9e545f7/log',
-        files: [
-          '/726338b0-24f7-11ec-b2cc-bd78a9e545f7/plotly.json',
-          '/726338b0-24f7-11ec-b2cc-bd78a9e545f7/result.md',
-        ],
-        response_type: 'data2files',
+        results: ['/726338b0-24f7-11ec-b2cc-bd78a9e545f7/result.md'],
+        charts: ['/726338b0-24f7-11ec-b2cc-bd78a9e545f7/plotly.json'],
+        response_type: 'data2charts',
         task_id: null,
       },
       description: 'Make a correlation plot.',

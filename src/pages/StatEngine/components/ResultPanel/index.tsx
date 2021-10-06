@@ -13,10 +13,10 @@ import { memo } from 'react';
 
 import PlotlyViewer from '../PlotlyViewer/indexClass';
 import ChartList from '../ChartList';
-import LogViewer from '../LogViewer';
+import LogViewer from '../LogViewer/indexLog';
 import { ChartMetaData } from '../ChartList/data';
 
-import { getDataResults } from '@/services/biominer/api';
+import { getPlotlyData } from '@/services/biominer/api';
 
 import { langData } from './lang';
 import './index.less';
@@ -25,35 +25,14 @@ const { TabPane } = Tabs;
 
 export type ResultPanelProps = {
   onClickItem: (chart: ChartMetaData) => void;
+  taskId: string;
   logLink: string;
-  resultId: string;
-  plotlyId: string;
+  results: string[];
+  charts: string[];
   responsiveKey: number | string;
 };
 
 const ResultPanel: React.FC<ResultPanelProps> = (props) => {
-  const { onClickItem, logLink, responsiveKey, resultId, plotlyId } = props;
-
-  const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
-  const [chartsVisible, setChartsVisible] = useState<boolean>(false);
-
-  const [dataSources, setDataSources] = useState<object>({});
-  const [dataSourceOptions, setDataSourceOptions] = useState<object[]>([]);
-
-  useEffect(() => {
-    if (resultId.length > 0) {
-      getDataResults(resultId, {}).then((response) => {
-        setDataSources(response);
-        setDataSourceOptions(
-          Object.keys(response).map((name) => ({
-            value: name,
-            label: name,
-          })),
-        );
-      });
-    }
-  }, [resultId]);
-
   const intl = useIntl();
   interface UIContext {
     [key: string]: any;
@@ -63,6 +42,28 @@ const ResultPanel: React.FC<ResultPanelProps> = (props) => {
   Object.keys(langData).forEach((key) => {
     uiContext[key] = intl.formatMessage(langData[key]);
   });
+
+  const { onClickItem, logLink, responsiveKey, taskId, results, charts } = props;
+
+  const [plotlyEditorMode, setPlotlyEditorMode] = useState<string>('Plotly');
+  const [chartsVisible, setChartsVisible] = useState<boolean>(false);
+
+  const [dataSources, setDataSources] = useState<object>({});
+  const [dataSourceOptions, setDataSourceOptions] = useState<object[]>([]);
+
+  useEffect(() => {
+    if (results.length > 0) {
+      getPlotlyData({ filelink: results[0] }).then((response) => {
+        setDataSources(response);
+        setDataSourceOptions(
+          Object.keys(response).map((name) => ({
+            value: name,
+            label: name,
+          })),
+        );
+      });
+    }
+  }, [results]);
 
   const resultOperations = (
     <Space>
@@ -129,7 +130,8 @@ const ResultPanel: React.FC<ResultPanelProps> = (props) => {
               responsiveKey={responsiveKey}
               dataSources={dataSources}
               dataSourceOptions={dataSourceOptions}
-              plotlyId={plotlyId}
+              plotlyId={charts[0]}
+              key={charts[0]}
               mode={plotlyEditorMode}
             ></PlotlyViewer>
           </Col>
@@ -156,7 +158,7 @@ const ResultPanel: React.FC<ResultPanelProps> = (props) => {
           }
           key="3"
         >
-          <LogViewer height="560" url={logLink} />
+          <LogViewer height="530px" url={logLink} />
         </TabPane>
       </Tabs>
       <Drawer
