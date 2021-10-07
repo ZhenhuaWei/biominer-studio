@@ -75,7 +75,7 @@ export async function getChartSchema(chartName: string, options?: { [key: string
 }
 
 export async function getChart(chartName: string, options?: { [key: string]: any }) {
-  return request<API.ChartList>(`/api/chart/${chartName}`, {
+  return request<API.ChartListItem>(`/api/chart/${chartName}`, {
     method: 'GET',
     ...(options || {}),
   });

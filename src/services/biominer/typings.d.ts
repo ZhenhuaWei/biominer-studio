@@ -71,6 +71,8 @@ export declare namespace API {
     success?: boolean;
   };
 
+  export type ChartListItem = ChartMetaData;
+
   export type ChartSchema = {
     schema: {
       fields: any[];

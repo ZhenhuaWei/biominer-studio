@@ -135,7 +135,7 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
   };
 
   const selectItem = useCallback(
-    (chart: ChartMetaData) => {
+    (chart: ChartMetaData, result?: ChartResult) => {
       getChartSchema(chart.short_name).then((response) => {
         const schema = {
           ...response.schema,
@@ -153,6 +153,12 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
         // Save currentChart into localStorage
         reactLocalStorage.setObject('BIO_MINER_CURRENT_CHART', chart);
       });
+
+      if (result) {
+        setResultData(result);
+      } else {
+        setResultData(null);
+      }
     },
     [currentChart],
   );
@@ -278,14 +284,20 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
   };
 
   useEffect(() => {
-    // Restore data from localStorage
-    // @ts-ignore
-    const chart: ChartMetaData = reactLocalStorage.getObject('BIO_MINER_CURRENT_CHART');
-    if (Object.entries(chart).length > 0) {
-      setCurrentChart(chart);
-      selectItem(chart);
+    if (currentChart) {
+      selectItem(currentChart);
     }
-  }, []);
+  }, [currentChart]);
+
+  // useEffect(() => {
+  //   // Restore data from localStorage
+  //   // @ts-ignore
+  //   const chart: ChartMetaData = reactLocalStorage.getObject('BIO_MINER_CURRENT_CHART');
+  //   if (Object.entries(chart).length > 0) {
+  //     setCurrentChart(chart);
+  //     selectItem(chart);
+  //   }
+  // }, []);
 
   return (
     <GridContent>

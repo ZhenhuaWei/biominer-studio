@@ -10,9 +10,16 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import { getTasks, getChart } from '@/services/biominer/api';
 import { API } from '@/services/biominer/typings';
 import { useHistory } from 'react-router-dom';
+import { ChartMetaData, ChartResult } from '@/pages/StatEngine/components/ChartList/data';
 import './index.less';
 
-const TableList: React.FC = () => {
+export type HistoryTableProps = {
+  onClickItem?: (chart: ChartMetaData, result: ChartResult) => void;
+};
+
+const TableList: React.FC<HistoryTableProps> = (props) => {
+  const { onClickItem } = props;
+
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const history = useHistory();
@@ -38,6 +45,8 @@ const TableList: React.FC = () => {
     {
       title: <FormattedMessage id="history-table.taskName" defaultMessage="Task Name" />,
       dataIndex: 'name',
+      hideInSearch: true,
+      hideInForm: true,
       tip: 'The task name is the unique key',
       render: (dom, entity) => {
         return (
@@ -62,16 +71,22 @@ const TableList: React.FC = () => {
             onClick={() => {
               getChart(entity.plugin_name)
                 .then((response) => {
-                  const result = entity.response;
-                  history.push('/stat-engine/index', {
-                    chart: response,
-                    result: {
-                      results: result.results,
-                      charts: result.charts,
-                      log: result.log,
-                      taskId: result.task_id,
-                    },
-                  });
+                  const resp = entity.response;
+                  const result = {
+                    results: resp.results,
+                    charts: resp.charts,
+                    log: resp.log,
+                    taskId: resp.task_id,
+                  };
+
+                  if (onClickItem) {
+                    onClickItem(response, result);
+                  } else {
+                    history.push('/stat-engine/index', {
+                      chart: response,
+                      result,
+                    });
+                  }
                 })
                 .catch((error) => {
                   message.error(`Cannot find the ${entity.plugin_name}`);

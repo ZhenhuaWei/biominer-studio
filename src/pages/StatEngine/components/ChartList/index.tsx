@@ -8,14 +8,14 @@ import { useHistory } from 'react-router-dom';
 // API Endpoint
 import { getCharts } from '@/services/biominer/api';
 
-import { ChartMetaData, Icon } from './data';
+import { ChartMetaData, ChartResult, Icon } from './data';
 import './index.less';
 
 // Custom Data
 import { langData } from './lang';
 
 export type ChartListProps = {
-  onClickItem?: (chart: ChartMetaData) => void;
+  onClickItem?: (chart: ChartMetaData, result?: ChartResult) => void;
 };
 
 const ChartList: React.FC<ChartListProps> = (props) => {
@@ -97,7 +97,7 @@ const ChartList: React.FC<ChartListProps> = (props) => {
           className="chart-item"
           onClick={() => {
             if (onClickItem) {
-              onClickItem(item);
+              onClickItem(item, undefined);
             } else {
               history.push('/stat-engine/index', {
                 chart: item,

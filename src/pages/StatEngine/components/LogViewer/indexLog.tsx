@@ -68,22 +68,24 @@ const LogViewer: React.FC<LogProps> = (props) => {
 
   console.log('LogViewer updated');
 
-  const LogContainer = () => {
-    if (!url) {
-      <Empty></Empty>;
-    } else if (log) {
+  if (!url) {
+    return <Empty></Empty>;
+  }
+
+  if (log) {
+    return (
       <Col>
         <ReactAnsi bodyStyle={{ maxHeight: height, overflowY: 'auto' }} log={log} />
         {buttons}
-      </Col>;
-    } else {
-      <Col className="spinning">
-        <Spin />
-      </Col>;
-    }
-  };
+      </Col>
+    );
+  }
 
-  return <LogContainer></LogContainer>;
+  return (
+    <Col className="spinning">
+      <Spin />
+    </Col>
+  );
 };
 
 export default memo(LogViewer);
