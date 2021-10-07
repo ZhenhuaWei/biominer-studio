@@ -2,6 +2,8 @@
 
 A Miner Studio for BioMedical Knownledges.
 
+[![Welcome to BioMiner](http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/biominer/welcome-to-biominer.png)](http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/biominer/welcome-to-biominer.mov)
+
 ## For Users
 
 Comming soon...
