@@ -2,7 +2,9 @@
 
 A Miner Studio for BioMedical Knownledges.
 
-[![Welcome to BioMiner](http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/biominer/welcome-to-biominer.png)](http://nordata-cdn.oss-cn-shanghai.aliyuncs.com/biominer/welcome-to-biominer.mov)
+<a href="https://www.bilibili.com/video/BV1B341117UQ/" target="_blank" alt="Welcome to BioMiner">
+  <img src="./docs/images/welcome-to-biominer.png" alt="Welcome to BioMiner" />
+</a>
 
 ## For Users
 

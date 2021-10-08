@@ -80,7 +80,7 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
   const [data, setData] = useState<any[][]>([]);
   const [annoData, setAnnoData] = useState<any[][]>([]);
   const [dataLoader, setDataLoader] = useState<{ [key: string]: DataLoader }>({});
-  const [resultData, setResultData] = useState<ChartResult | null>(
+  const [resultData, setResultData] = useState<ChartResult | undefined>(
     (props.location.state && props.location.state.result) || {
       results: [],
       charts: [],
@@ -285,7 +285,7 @@ const StatEngine: React.FC<RouteComponentProps<{}, StaticContext, LocationState>
 
   useEffect(() => {
     if (currentChart) {
-      selectItem(currentChart);
+      selectItem(currentChart, resultData);
     }
   }, [currentChart]);
 
